@@ -1,0 +1,66 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* EMU Light Theme - White and Light Blue */
+  --primary-blue: #3b82f6;
+  --light-blue: #93c5fd;
+  --pale-blue: #dbeafe;
+  --white: #ffffff;
+  --off-white: #f8fafc;
+  --text-dark: #1e293b;
+  --text-medium: #475569;
+  --text-light: #64748b;
+
+  color-scheme: light;
+  color: var(--text-dark);
+  background-color: var(--white);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: var(--primary-blue);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--light-blue);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--white);
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 2px solid var(--primary-blue);
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--primary-blue);
+  color: var(--white);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+button:hover {
+  background-color: var(--light-blue);
+  border-color: var(--light-blue);
+}
+button:focus,
+button:focus-visible {
+  outline: 3px solid var(--pale-blue);
+}
