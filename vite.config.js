@@ -5,5 +5,5 @@ import { ghPages } from 'vite-plugin-gh-pages'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), ghPages()],
-  base: '/EMU-website/',
+  base: process.env.NODE_ENV === 'production' ? '/EMU-website/' : '/',
 })
