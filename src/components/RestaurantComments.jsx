@@ -130,13 +130,13 @@ const RestaurantComments = ({ restaurantId, currentUser }) => {
             <div className="add-comment">
               <h4>Add a comment</h4>
               <div className="rating-input">
-                <label>Rating (optional):</label>
+                <label>Rating:</label>
                 {renderStars(newRating, true, setNewRating)}
               </div>
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Share your experience..."
+                placeholder=""
                 maxLength={500}
                 rows={3}
               />
@@ -156,8 +156,6 @@ const RestaurantComments = ({ restaurantId, currentUser }) => {
           <div className="comments-list">
             {loading ? (
               <p>Loading comments...</p>
-            ) : comments.length === 0 ? (
-              <p>No comments yet. Be the first to share your experience!</p>
             ) : (
               comments.map((comment) => (
                 <div key={comment._id} className="comment">

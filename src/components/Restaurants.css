@@ -1090,7 +1090,7 @@
 }
 
 .star {
-  font-size: 1rem;
+  font-size: 1.25rem;
   color: #d1d5db;
   transition: color 0.2s;
 }
@@ -1196,7 +1196,7 @@
 }
 
 .comment-rating .stars {
-  font-size: 0.875rem;
+  font-size: 1.125rem;
 }
 
 .comment-text {
