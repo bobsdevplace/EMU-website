@@ -15,8 +15,9 @@ import socialRoutes from './routes/social.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables
-dotenv.config({ path: path.join(__dirname, '.env') });
+// Load environment variables - try multiple paths for different deployment scenarios
+dotenv.config({ path: path.join(__dirname, '.env') }); // Local development
+dotenv.config({ path: path.join(process.cwd(), '.env') }); // Railway deployment
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -38,6 +39,13 @@ app.use(cors());
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Debug: Check if MongoDB URI is loaded
+console.log('MongoDB URI loaded:', process.env.MONGODB_URI ? 'Yes' : 'No');
+if (!process.env.MONGODB_URI) {
+  console.error('MONGODB_URI environment variable is not set!');
+  process.exit(1);
+}
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
