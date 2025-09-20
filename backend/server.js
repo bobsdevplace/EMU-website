@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 import restaurantRoutes from './routes/restaurants.js';
 import userRoutes from './routes/users.js';
 import socialRoutes from './routes/social.js';
+import commentRoutes from './routes/comments.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,6 +107,7 @@ app.get('/health', (req, res) => {
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/social', socialRoutes);
+app.use('/api/comments', commentRoutes);
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../dist')));

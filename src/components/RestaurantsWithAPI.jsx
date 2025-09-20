@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import apiService from '../services/api.js'
+import RestaurantComments from './RestaurantComments.jsx'
 
 // Fix for default markers in Vite/React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -1062,6 +1063,10 @@ out center;`
                     Not Interested
                   </button>
                 </div>
+                <RestaurantComments
+                  restaurantId={restaurant.id}
+                  currentUser={currentUser}
+                />
               </div>
             </Popup>
           </Marker>

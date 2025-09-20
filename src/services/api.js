@@ -128,6 +128,50 @@ class ApiService {
       body: { user, restaurantName, restaurantId, action, location }
     });
   }
+
+  // Comment methods
+  async getRestaurantComments(restaurantId, limit = 20, offset = 0) {
+    const params = new URLSearchParams({
+      limit: limit.toString(),
+      offset: offset.toString()
+    });
+
+    return this.request(`/comments/restaurant/${encodeURIComponent(restaurantId)}?${params}`);
+  }
+
+  async getUserComments(username, limit = 20, offset = 0) {
+    const params = new URLSearchParams({
+      limit: limit.toString(),
+      offset: offset.toString()
+    });
+
+    return this.request(`/comments/user/${encodeURIComponent(username)}?${params}`);
+  }
+
+  async addComment(restaurantId, username, comment, rating = null) {
+    return this.request('/comments', {
+      method: 'POST',
+      body: { restaurantId, username, comment, rating }
+    });
+  }
+
+  async updateComment(commentId, username, comment, rating = null) {
+    return this.request(`/comments/${commentId}`, {
+      method: 'PUT',
+      body: { username, comment, rating }
+    });
+  }
+
+  async deleteComment(commentId, username) {
+    return this.request(`/comments/${commentId}`, {
+      method: 'DELETE',
+      body: { username }
+    });
+  }
+
+  async getCommentStats(restaurantId) {
+    return this.request(`/comments/stats/${encodeURIComponent(restaurantId)}`);
+  }
 }
 
 export default new ApiService();
