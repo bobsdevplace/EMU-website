@@ -3,7 +3,9 @@
     "allow": [
       "WebFetch(domain:www.blackbird.xyz)",
       "Bash(npm run dev:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "WebFetch(domain:overpass-api.de)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

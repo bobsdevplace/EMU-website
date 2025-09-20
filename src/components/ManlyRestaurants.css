@@ -1,0 +1,340 @@
+.manly-restaurants-container {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 2rem 0;
+}
+
+.map-header {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  margin: 0 1rem 2rem 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.map-header h1 {
+  color: #1e293b;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.map-header p {
+  color: #64748b;
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+}
+
+.restaurant-count {
+  background: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  display: inline-block;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.filter-container {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.cuisine-filter {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  font-size: 1rem;
+  color: #1e293b;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 200px;
+}
+
+.cuisine-filter:hover {
+  border-color: #3b82f6;
+}
+
+.cuisine-filter:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+@media (min-width: 640px) {
+  .filter-container {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .filter-label {
+    white-space: nowrap;
+  }
+}
+
+.restaurant-map {
+  margin: 0 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.loading-container,
+.error-container {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  margin: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner {
+  font-size: 3rem;
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+}
+
+.retry-button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background: #2563eb;
+}
+
+.restaurant-popup {
+  min-width: 250px;
+}
+
+.restaurant-popup h3 {
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.restaurant-popup p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.restaurant-popup .type {
+  color: #059669;
+  font-weight: 600;
+}
+
+.restaurant-popup .cuisine {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.restaurant-popup .website a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.restaurant-popup .website a:hover {
+  text-decoration: underline;
+}
+
+.restaurant-services {
+  margin-top: 0.5rem;
+}
+
+.service-tag {
+  display: inline-block;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.beach-popup {
+  text-align: center;
+}
+
+.beach-popup h3 {
+  color: #0891b2;
+  margin: 0 0 0.5rem 0;
+}
+
+.restaurant-list {
+  margin: 3rem 1rem 2rem 1rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.restaurant-list h2 {
+  color: #1e293b;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.restaurant-card {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.restaurant-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.restaurant-card h3 {
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.restaurant-card .type {
+  color: #059669;
+  font-weight: 600;
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.restaurant-card .cuisine {
+  color: #3b82f6;
+  font-weight: 600;
+  margin: 0.25rem 0;
+}
+
+.restaurant-card .address,
+.restaurant-card .phone,
+.restaurant-card .hours {
+  color: #64748b;
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.restaurant-card .service-tag {
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+.website-link {
+  display: inline-block;
+  background: #3b82f6;
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  transition: background-color 0.2s;
+}
+
+.website-link:hover {
+  background: #2563eb;
+}
+
+.show-more {
+  text-align: center;
+  padding: 2rem 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.show-more p {
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.show-more button {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.show-more button:hover {
+  background: #059669;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .manly-restaurants-container {
+    padding: 1rem 0;
+  }
+
+  .map-header,
+  .restaurant-map,
+  .restaurant-list {
+    margin: 0 0.5rem 1rem 0.5rem;
+  }
+
+  .map-header h1 {
+    font-size: 2rem;
+  }
+
+  .restaurant-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .restaurant-card {
+    padding: 1rem;
+  }
+
+  .loading-container,
+  .error-container {
+    margin: 1rem;
+    padding: 2rem 1rem;
+  }
+}
