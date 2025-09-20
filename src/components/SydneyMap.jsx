@@ -113,9 +113,33 @@ const sydneyRestaurants = [
   }
 ];
 
-const SydneyMap = () => {
+const SydneyMap = ({ loggedInUser }) => {
   // Sydney city center coordinates
   const sydneyCenter = [-33.8688, 151.2093];
+
+  // Create custom colored icons based on logged-in user
+  const createCustomIcon = (color) => {
+    return new L.Icon({
+      iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+  };
+
+  // Determine marker color based on logged-in user
+  const getMarkerIcon = () => {
+    if (!loggedInUser) {
+      return createCustomIcon('blue'); // Default blue for no user
+    } else if (loggedInUser === 'Julien') {
+      return createCustomIcon('green'); // Green for Julien
+    } else if (loggedInUser === 'Jimmy') {
+      return createCustomIcon('red'); // Red for Jimmy
+    }
+    return createCustomIcon('blue'); // Fallback to blue
+  };
 
   return (
     <div className="sydney-map-container">
@@ -139,6 +163,7 @@ const SydneyMap = () => {
           <Marker
             key={restaurant.id}
             position={[restaurant.lat, restaurant.lng]}
+            icon={getMarkerIcon()}
           >
             <Popup>
               <div className="restaurant-popup">
