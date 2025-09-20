@@ -2,8 +2,8 @@ import { useState } from 'react'
 import './App.css'
 import SydneyMap from './components/SydneyMap'
 import './components/SydneyMap.css'
-import ManlyRestaurants from './components/ManlyRestaurants'
-import './components/ManlyRestaurants.css'
+import Restaurants from './components/Restaurants'
+import './components/Restaurants.css'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
@@ -13,7 +13,7 @@ function App() {
       case 'map':
         return <SydneyMap />
       case 'restaurants':
-        return <ManlyRestaurants />
+        return <Restaurants />
       default:
         return <HomePage />
     }

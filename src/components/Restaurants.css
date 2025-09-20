@@ -1,4 +1,4 @@
-.manly-restaurants-container {
+.restaurants-container {
   min-height: 100vh;
   background: #f8fafc;
   padding: 2rem 0;
@@ -36,8 +36,180 @@
   margin-top: 1rem;
 }
 
-.filter-container {
+/* Location Search Styling */
+.location-search-container {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: #f1f5f9;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.search-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.location-input-group,
+.radius-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.search-label {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9rem;
+}
+
+.search-input-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.location-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.location-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-button {
+  padding: 0.75rem 1.5rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.search-button:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.search-button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.radius-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.radius-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.radius-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.apply-radius-button {
+  padding: 0.75rem 1rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.apply-radius-button:hover {
+  background: #059669;
+}
+
+.preset-locations {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+.preset-label {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.preset-button {
+  padding: 0.5rem 1rem;
+  background: white;
+  color: #475569;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.preset-button:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.preset-button.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+@media (min-width: 768px) {
+  .search-controls {
+    flex-direction: row;
+    align-items: end;
+  }
+
+  .location-input-group {
+    flex: 2;
+  }
+
+  .radius-input-group {
+    flex: 1;
+  }
+}
+
+.filters-container {
   margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-group {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -50,7 +222,8 @@
   font-size: 1rem;
 }
 
-.cuisine-filter {
+.cuisine-filter,
+.visit-filter {
   padding: 0.75rem 1rem;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
@@ -62,18 +235,25 @@
   min-width: 200px;
 }
 
-.cuisine-filter:hover {
+.cuisine-filter:hover,
+.visit-filter:hover {
   border-color: #3b82f6;
 }
 
-.cuisine-filter:focus {
+.cuisine-filter:focus,
+.visit-filter:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-@media (min-width: 640px) {
-  .filter-container {
+@media (min-width: 768px) {
+  .filters-container {
+    flex-direction: row;
+    gap: 2rem;
+  }
+
+  .filter-group {
     flex-direction: row;
     gap: 1rem;
   }
@@ -174,6 +354,62 @@
   text-decoration: underline;
 }
 
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.popup-header h3 {
+  margin: 0;
+  flex: 1;
+}
+
+.visited-badge {
+  background: #10b981;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+  white-space: nowrap;
+}
+
+.visit-button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.visit-button:hover {
+  background: #2563eb;
+}
+
+.visit-button.visited {
+  background: #dc2626;
+}
+
+.visit-button.visited:hover {
+  background: #b91c1c;
+}
+
+.visit-button.unvisited {
+  background: #10b981;
+}
+
+.visit-button.unvisited:hover {
+  background: #059669;
+}
+
 .restaurant-services {
   margin-top: 0.5rem;
 }
@@ -189,11 +425,11 @@
   margin-bottom: 0.25rem;
 }
 
-.beach-popup {
+.reference-popup {
   text-align: center;
 }
 
-.beach-popup h3 {
+.reference-popup h3 {
   color: #0891b2;
   margin: 0 0 0.5rem 0;
 }
@@ -233,6 +469,27 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+.restaurant-card.visited-card {
+  background: #f0fdf4;
+  border-color: #10b981;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.card-header h3 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  flex: 1;
+}
+
 .restaurant-card h3 {
   color: #1e293b;
   margin: 0 0 0.5rem 0;
@@ -266,6 +523,13 @@
   margin-right: 0.5rem;
 }
 
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .website-link {
   display: inline-block;
   background: #3b82f6;
@@ -274,12 +538,20 @@
   padding: 0.5rem 1rem;
   border-radius: 6px;
   font-size: 0.9rem;
-  margin-top: 0.75rem;
   transition: background-color 0.2s;
+  flex: 1;
+  text-align: center;
+  min-width: 120px;
 }
 
 .website-link:hover {
   background: #2563eb;
+}
+
+.card-actions .visit-button {
+  flex: 1;
+  margin-top: 0;
+  min-width: 120px;
 }
 
 .show-more {
@@ -310,7 +582,7 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .manly-restaurants-container {
+  .restaurants-container {
     padding: 1rem 0;
   }
 
