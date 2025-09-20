@@ -11,7 +11,25 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Create custom green marker for visited restaurants
+// Create custom markers for different user profiles
+const orangeIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+const yellowIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
 const greenIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
@@ -21,9 +39,18 @@ const greenIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-// Default blue marker
-const blueIcon = new L.Icon({
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+const redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+// Default grey marker for unvisited restaurants
+const greyIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -38,6 +65,8 @@ const Restaurants = () => {
   const [selectedCuisine, setSelectedCuisine] = useState('all')
   const [allRestaurants, setAllRestaurants] = useState([])
   const [visitedRestaurants, setVisitedRestaurants] = useState(new Set())
+  const [interestedRestaurants, setInterestedRestaurants] = useState(new Set())
+  const [notInterestedRestaurants, setNotInterestedRestaurants] = useState(new Set())
   const [visitFilter, setVisitFilter] = useState('all')
 
   // Location and search state
@@ -53,6 +82,7 @@ const Restaurants = () => {
   const [currentUser, setCurrentUser] = useState('Julien')
   const [socialFeed, setSocialFeed] = useState([])
   const [showFeed, setShowFeed] = useState(false)
+  const [savedLocations, setSavedLocations] = useState([])
 
   // Available users
   const users = ['Julien', 'Jimmy']
@@ -73,6 +103,42 @@ const Restaurants = () => {
       localStorage.setItem(`visitedRestaurants_${user}`, JSON.stringify([...visitedSet]))
     } catch (error) {
       console.error('Error saving visited restaurants:', error)
+    }
+  }
+
+  const loadInterestedRestaurants = (user = currentUser) => {
+    try {
+      const interested = localStorage.getItem(`interestedRestaurants_${user}`)
+      return interested ? new Set(JSON.parse(interested)) : new Set()
+    } catch (error) {
+      console.error('Error loading interested restaurants:', error)
+      return new Set()
+    }
+  }
+
+  const saveInterestedRestaurants = (interestedSet, user = currentUser) => {
+    try {
+      localStorage.setItem(`interestedRestaurants_${user}`, JSON.stringify([...interestedSet]))
+    } catch (error) {
+      console.error('Error saving interested restaurants:', error)
+    }
+  }
+
+  const loadNotInterestedRestaurants = (user = currentUser) => {
+    try {
+      const notInterested = localStorage.getItem(`notInterestedRestaurants_${user}`)
+      return notInterested ? new Set(JSON.parse(notInterested)) : new Set()
+    } catch (error) {
+      console.error('Error loading not interested restaurants:', error)
+      return new Set()
+    }
+  }
+
+  const saveNotInterestedRestaurants = (notInterestedSet, user = currentUser) => {
+    try {
+      localStorage.setItem(`notInterestedRestaurants_${user}`, JSON.stringify([...notInterestedSet]))
+    } catch (error) {
+      console.error('Error saving not interested restaurants:', error)
     }
   }
 
@@ -112,6 +178,52 @@ const Restaurants = () => {
     saveSocialFeed(updatedFeed)
   }
 
+  // Saved locations localStorage functions
+  const loadSavedLocations = () => {
+    try {
+      const saved = localStorage.getItem('savedLocations')
+      return saved ? JSON.parse(saved) : []
+    } catch (error) {
+      console.error('Error loading saved locations:', error)
+      return []
+    }
+  }
+
+  const saveSavedLocations = (locations) => {
+    try {
+      localStorage.setItem('savedLocations', JSON.stringify(locations))
+    } catch (error) {
+      console.error('Error saving locations:', error)
+    }
+  }
+
+  const saveCurrentLocation = () => {
+    const locationToSave = {
+      name: currentLocation.name,
+      coordinates: currentLocation.coordinates,
+      id: Date.now(),
+      savedAt: new Date().toLocaleDateString()
+    }
+
+    const existingLocations = savedLocations.filter(loc =>
+      loc.name !== currentLocation.name
+    )
+
+    const updatedLocations = [locationToSave, ...existingLocations].slice(0, 10) // Keep max 10 saved locations
+    setSavedLocations(updatedLocations)
+    saveSavedLocations(updatedLocations)
+  }
+
+  const removeSavedLocation = (locationId) => {
+    const updatedLocations = savedLocations.filter(loc => loc.id !== locationId)
+    setSavedLocations(updatedLocations)
+    saveSavedLocations(updatedLocations)
+  }
+
+  const isLocationSaved = (locationName) => {
+    return savedLocations.some(loc => loc.name === locationName)
+  }
+
   const toggleVisitedRestaurant = (restaurantId) => {
     const restaurant = allRestaurants.find(r => r.id === restaurantId)
     const newVisited = new Set(visitedRestaurants)
@@ -131,16 +243,92 @@ const Restaurants = () => {
     saveVisitedRestaurants(newVisited, currentUser)
   }
 
+  const toggleInterestedRestaurant = (restaurantId) => {
+    const newInterested = new Set(interestedRestaurants)
+    const newNotInterested = new Set(notInterestedRestaurants)
+
+    if (newInterested.has(restaurantId)) {
+      newInterested.delete(restaurantId)
+    } else {
+      newInterested.add(restaurantId)
+      // Remove from not interested if it was there
+      newNotInterested.delete(restaurantId)
+      setNotInterestedRestaurants(newNotInterested)
+      saveNotInterestedRestaurants(newNotInterested, currentUser)
+    }
+
+    setInterestedRestaurants(newInterested)
+    saveInterestedRestaurants(newInterested, currentUser)
+  }
+
+  const toggleNotInterestedRestaurant = (restaurantId) => {
+    const newNotInterested = new Set(notInterestedRestaurants)
+    const newInterested = new Set(interestedRestaurants)
+
+    if (newNotInterested.has(restaurantId)) {
+      newNotInterested.delete(restaurantId)
+    } else {
+      newNotInterested.add(restaurantId)
+      // Remove from interested if it was there
+      newInterested.delete(restaurantId)
+      setInterestedRestaurants(newInterested)
+      saveInterestedRestaurants(newInterested, currentUser)
+    }
+
+    setNotInterestedRestaurants(newNotInterested)
+    saveNotInterestedRestaurants(newNotInterested, currentUser)
+  }
+
   // Switch user function
   const switchUser = (newUser) => {
     setCurrentUser(newUser)
     // Load the new user's visited restaurants
     const newUserVisited = loadVisitedRestaurants(newUser)
     setVisitedRestaurants(newUserVisited)
+    // Load the new user's interested restaurants
+    const newUserInterested = loadInterestedRestaurants(newUser)
+    setInterestedRestaurants(newUserInterested)
+    // Load the new user's not interested restaurants
+    const newUserNotInterested = loadNotInterestedRestaurants(newUser)
+    setNotInterestedRestaurants(newUserNotInterested)
   }
 
   const isRestaurantVisited = (restaurantId) => {
     return visitedRestaurants.has(restaurantId)
+  }
+
+  // Determine which user visited a restaurant
+  const getRestaurantVisitor = (restaurantId) => {
+    const julienVisited = loadVisitedRestaurants('Julien')
+    const jimmyVisited = loadVisitedRestaurants('Jimmy')
+
+    if (julienVisited.has(restaurantId)) {
+      return 'Julien'
+    } else if (jimmyVisited.has(restaurantId)) {
+      return 'Jimmy'
+    }
+    return null // Not visited by anyone
+  }
+
+  // Get appropriate icon based on interest level and visit status
+  const getRestaurantIcon = (restaurantId) => {
+    // Priority 1: Current user's interest level (highest priority)
+    if (interestedRestaurants.has(restaurantId)) {
+      return greenIcon
+    } else if (notInterestedRestaurants.has(restaurantId)) {
+      return redIcon
+    }
+
+    // Priority 2: Visited restaurants (orange for Julien, yellow for Jimmy)
+    const visitor = getRestaurantVisitor(restaurantId)
+    if (visitor === 'Julien') {
+      return orangeIcon
+    } else if (visitor === 'Jimmy') {
+      return yellowIcon
+    }
+
+    // Default: Grey for neutral/unvisited
+    return greyIcon
   }
 
   // Geocoding function to convert location name to coordinates
@@ -251,11 +439,21 @@ out center;`
                     element.tags?.brand ||
                     `${amenityType.charAt(0).toUpperCase() + amenityType.slice(1)} (Unnamed)`
 
-        // Format cuisine: replace semicolons with commas and underscores with spaces
+        // Capitalize first letter of words
+        const capitalizeWords = (str) => {
+          return str.split(' ').map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          ).join(' ')
+        }
+
+        // Format cuisine: replace semicolons with commas and underscores with spaces, then capitalize
         const rawCuisine = element.tags?.cuisine || 'Not specified'
         const formattedCuisine = rawCuisine === 'Not specified'
           ? 'Not specified'
-          : rawCuisine.split(';').map(c => c.trim().replace(/_/g, ' ')).join(', ')
+          : rawCuisine.split(';').map(c => capitalizeWords(c.trim().replace(/_/g, ' '))).join(', ')
+
+        // Format restaurant type with proper capitalization
+        const formattedType = capitalizeWords(amenityType.replace(/_/g, ' '))
 
         // Improved address extraction with multiple fallback options
         const getAddress = () => {
@@ -294,7 +492,7 @@ out center;`
         return {
           id: element.id || index,
           name: name,
-          type: amenityType,
+          type: formattedType,
           cuisine: formattedCuisine,
           address: getAddress(),
           lat: lat,
@@ -446,14 +644,11 @@ out center;`
     await fetchRestaurants(currentLocation, searchRadius)
   }
 
-  // Preset locations for quick selection
-  const presetLocations = [
-    { name: 'Manly Beach, Australia', coordinates: [-33.797286, 151.287778] },
-    { name: 'Bondi Beach, Australia', coordinates: [-33.890542, 151.274856] },
-    { name: 'Sydney CBD, Australia', coordinates: [-33.8688, 151.2093] },
-    { name: 'Circular Quay, Sydney', coordinates: [-33.8614, 151.2108] },
-    { name: 'Darling Harbour, Sydney', coordinates: [-33.8730, 151.2020] }
-  ]
+  // Combined preset locations (only saved locations, no defaults)
+  const presetLocations = savedLocations.map(loc => ({
+    ...loc,
+    isDefault: false
+  }))
 
   const selectPresetLocation = async (location) => {
     setSearchLocation(location.name)
@@ -642,8 +837,14 @@ out center;`
   useEffect(() => {
     // Load visited restaurants from localStorage for current user
     setVisitedRestaurants(loadVisitedRestaurants(currentUser))
+    // Load interested restaurants from localStorage for current user
+    setInterestedRestaurants(loadInterestedRestaurants(currentUser))
+    // Load not interested restaurants from localStorage for current user
+    setNotInterestedRestaurants(loadNotInterestedRestaurants(currentUser))
     // Load social feed
     setSocialFeed(loadSocialFeed())
+    // Load saved locations
+    setSavedLocations(loadSavedLocations())
     fetchRestaurants()
   }, [])
 
@@ -710,7 +911,7 @@ out center;`
         </div>
 
         <p className="restaurant-count">
-          Found {restaurants.length} of {allRestaurants.length} restaurants
+          Found {restaurants.length} restaurants
         </p>
 
         {/* Social Feed */}
@@ -758,6 +959,14 @@ out center;`
                 >
                   {isSearching ? '🔍 Searching...' : '🔍 Search'}
                 </button>
+                <button
+                  onClick={saveCurrentLocation}
+                  disabled={isLocationSaved(currentLocation.name)}
+                  className={`save-location-button ${isLocationSaved(currentLocation.name) ? 'saved' : ''}`}
+                  title={isLocationSaved(currentLocation.name) ? 'Location already saved' : 'Save current location'}
+                >
+                  {isLocationSaved(currentLocation.name) ? '⭐' : '☆'}
+                </button>
               </div>
             </div>
 
@@ -791,16 +1000,29 @@ out center;`
 
           {/* Preset Locations */}
           <div className="preset-locations">
-            <p className="preset-label">Quick locations:</p>
+            <div className="preset-label">Quick locations:</div>
             <div className="preset-buttons">
               {presetLocations.map((location) => (
-                <button
-                  key={location.name}
-                  onClick={() => selectPresetLocation(location)}
-                  className={`preset-button ${currentLocation.name === location.name ? 'active' : ''}`}
-                >
-                  {location.name.split(',')[0]}
-                </button>
+                <div key={location.name} className="preset-button-container">
+                  <button
+                    onClick={() => selectPresetLocation(location)}
+                    className={`preset-button ${currentLocation.name === location.name ? 'active' : ''}`}
+                  >
+                    {location.name.split(',')[0]} ⭐
+                  </button>
+                  {!location.isDefault && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        removeSavedLocation(location.id)
+                      }}
+                      className="remove-location-button"
+                      title="Remove saved location"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
               ))}
             </div>
           </div>
@@ -873,13 +1095,13 @@ out center;`
           <Marker
             key={restaurant.id}
             position={[restaurant.lat, restaurant.lng]}
-            icon={isRestaurantVisited(restaurant.id) ? greenIcon : blueIcon}
+            icon={getRestaurantIcon(restaurant.id)}
           >
             <Popup>
               <div className="restaurant-popup">
                 <div className="popup-header">
                   <h3>
-                    {restaurant.name} {getRestaurantEmoji(restaurant.cuisine, restaurant.type)}
+                    {restaurant.name} {getRestaurantEmoji(restaurant.cuisine.toLowerCase(), restaurant.type.toLowerCase())}
                   </h3>
                   {isRestaurantVisited(restaurant.id) && (
                     <span className="visited-badge">✅ Visited</span>
@@ -909,12 +1131,26 @@ out center;`
                     <span className="service-tag">🚚 Delivery</span>
                   )}
                 </div>
-                <button
-                  onClick={() => toggleVisitedRestaurant(restaurant.id)}
-                  className={`visit-button ${isRestaurantVisited(restaurant.id) ? 'visited' : 'unvisited'}`}
-                >
-                  {isRestaurantVisited(restaurant.id) ? '❌ Mark as Not Visited' : '✅ Mark as Visited'}
-                </button>
+                <div className="restaurant-controls-grid">
+                  <button
+                    onClick={() => toggleVisitedRestaurant(restaurant.id)}
+                    className={`control-button visited-button ${isRestaurantVisited(restaurant.id) ? 'active' : ''} ${currentUser.toLowerCase()}-profile`}
+                  >
+                    Visited
+                  </button>
+                  <button
+                    onClick={() => toggleInterestedRestaurant(restaurant.id)}
+                    className={`control-button interested-button ${interestedRestaurants.has(restaurant.id) ? 'active' : ''}`}
+                  >
+                    Interested
+                  </button>
+                  <button
+                    onClick={() => toggleNotInterestedRestaurant(restaurant.id)}
+                    className={`control-button not-interested-button ${notInterestedRestaurants.has(restaurant.id) ? 'active' : ''}`}
+                  >
+                    Not Interested
+                  </button>
+                </div>
               </div>
             </Popup>
           </Marker>
@@ -931,14 +1167,16 @@ out center;`
             >
               <div className="card-header">
                 <h3>
-                  {restaurant.name} {getRestaurantEmoji(restaurant.cuisine, restaurant.type)}
+                  {restaurant.name} {getRestaurantEmoji(restaurant.cuisine.toLowerCase(), restaurant.type.toLowerCase())}
                 </h3>
                 {isRestaurantVisited(restaurant.id) && (
                   <span className="visited-badge">✅ Visited</span>
                 )}
               </div>
               <p className="type">{restaurant.type}</p>
-              <p className="cuisine">{restaurant.cuisine}</p>
+              {restaurant.cuisine !== 'Not specified' && (
+                <p className="cuisine">{restaurant.cuisine}</p>
+              )}
               <p className="address">{restaurant.address}</p>
               {restaurant.phone !== 'N/A' && (
                 <p className="phone">📞 {restaurant.phone}</p>
@@ -954,8 +1192,8 @@ out center;`
                   <span className="service-tag">🚚</span>
                 )}
               </div>
-              <div className="card-actions">
-                {restaurant.website && (
+              {restaurant.website ? (
+                <div className="card-actions">
                   <a
                     href={restaurant.website}
                     target="_blank"
@@ -964,14 +1202,49 @@ out center;`
                   >
                     Visit Website
                   </a>
-                )}
-                <button
-                  onClick={() => toggleVisitedRestaurant(restaurant.id)}
-                  className={`visit-button ${isRestaurantVisited(restaurant.id) ? 'visited' : 'unvisited'}`}
-                >
-                  {isRestaurantVisited(restaurant.id) ? '❌ Not Visited' : '✅ Mark Visited'}
-                </button>
-              </div>
+                  <div className="restaurant-controls-grid">
+                    <button
+                      onClick={() => toggleVisitedRestaurant(restaurant.id)}
+                      className={`control-button visited-button ${isRestaurantVisited(restaurant.id) ? 'active' : ''} ${currentUser.toLowerCase()}-profile`}
+                    >
+                      Visited
+                    </button>
+                    <button
+                      onClick={() => toggleInterestedRestaurant(restaurant.id)}
+                      className={`control-button interested-button ${interestedRestaurants.has(restaurant.id) ? 'active' : ''}`}
+                    >
+                      Interested
+                    </button>
+                    <button
+                      onClick={() => toggleNotInterestedRestaurant(restaurant.id)}
+                      className={`control-button not-interested-button ${notInterestedRestaurants.has(restaurant.id) ? 'active' : ''}`}
+                    >
+                      Not Interested
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="restaurant-controls-grid">
+                  <button
+                    onClick={() => toggleVisitedRestaurant(restaurant.id)}
+                    className={`control-button visited-button ${isRestaurantVisited(restaurant.id) ? 'active' : ''} ${currentUser.toLowerCase()}-profile`}
+                  >
+                    Visited
+                  </button>
+                  <button
+                    onClick={() => toggleInterestedRestaurant(restaurant.id)}
+                    className={`control-button interested-button ${interestedRestaurants.has(restaurant.id) ? 'active' : ''}`}
+                  >
+                    Interested
+                  </button>
+                  <button
+                    onClick={() => toggleNotInterestedRestaurant(restaurant.id)}
+                    className={`control-button not-interested-button ${notInterestedRestaurants.has(restaurant.id) ? 'active' : ''}`}
+                  >
+                    Not Interested
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

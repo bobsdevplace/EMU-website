@@ -8,30 +8,35 @@
   text-align: center;
   padding: 2rem;
   background: white;
-  margin: 0 1rem 2rem 1rem;
+  margin: 0 auto 2rem auto;
+  max-width: 1200px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-top {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 1rem;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 2rem;
+  position: relative;
 }
 
 .header-title {
-  flex: 1;
-  text-align: left;
+  flex: 0 1 auto;
+  text-align: center;
 }
 
 .user-controls {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  align-items: flex-end;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .user-switcher {
@@ -183,8 +188,8 @@
 }
 
 .restaurant-count {
-  background: #3b82f6;
-  color: white;
+  background: #3b82f6 !important;
+  color: white !important;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   display: inline-block;
@@ -194,11 +199,12 @@
 
 /* Location Search Styling */
 .location-search-container {
-  margin: 2rem 0;
+  margin: 2rem auto;
   padding: 1.5rem;
   background: #f1f5f9;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
+  max-width: 800px;
 }
 
 .search-controls {
@@ -206,6 +212,7 @@
   flex-direction: column;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
+  align-items: center;
 }
 
 .location-input-group,
@@ -213,6 +220,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
 }
 
 .search-label {
@@ -224,6 +234,8 @@
 .search-input-container {
   display: flex;
   gap: 0.5rem;
+  width: 100%;
+  justify-content: center;
 }
 
 .location-input {
@@ -263,10 +275,51 @@
   cursor: not-allowed;
 }
 
+.save-location-button {
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  color: #64748b;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+}
+
+.save-location-button:hover:not(:disabled) {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  transform: scale(1.05);
+}
+
+.save-location-button:disabled {
+  background: #f1f5f9;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.save-location-button.saved {
+  background: #fef3c7;
+  color: #f59e0b;
+  border-color: #fbbf24;
+}
+
+.save-location-button.saved:hover {
+  background: #fde68a;
+  border-color: #f59e0b;
+}
+
 .radius-container {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .radius-select {
@@ -304,19 +357,32 @@
 .preset-locations {
   border-top: 1px solid #e2e8f0;
   padding-top: 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 .preset-label {
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 0.75rem;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  text-align: center;
 }
 
 .preset-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  justify-content: center;
+}
+
+.preset-button-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 .preset-button {
@@ -342,27 +408,63 @@
   border-color: #3b82f6;
 }
 
+.remove-location-button {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  max-width: 16px;
+  min-height: 16px;
+  max-height: 16px;
+  border-radius: 50%;
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 0.5em 0.9em;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 10;
+  line-height: 1;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.remove-location-button:hover {
+  background: #b91c1c;
+  transform: scale(1.1);
+}
+
 @media (min-width: 768px) {
   .search-controls {
     flex-direction: row;
     align-items: end;
+    justify-content: center;
+    gap: 2rem;
   }
 
   .location-input-group {
-    flex: 2;
+    flex: 0 1 400px;
   }
 
   .radius-input-group {
-    flex: 1;
+    flex: 0 1 250px;
   }
 }
 
 .filters-container {
-  margin-top: 1.5rem;
+  margin: 1.5rem auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  max-width: 600px;
 }
 
 .filter-group {
@@ -420,10 +522,12 @@
 }
 
 .restaurant-map {
-  margin: 0 1rem;
+  margin: 0 auto;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: calc(1200px + 4rem);
+  width: calc(100% + 2rem);
 }
 
 .loading-container,
@@ -591,11 +695,13 @@
 }
 
 .restaurant-list {
-  margin: 3rem 1rem 2rem 1rem;
+  margin: 3rem auto 2rem auto;
   background: white;
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: calc(1200px + 4rem);
+  width: calc(100% + 2rem);
 }
 
 .restaurant-list h2 {
@@ -618,6 +724,9 @@
   border-radius: 12px;
   border: 1px solid #e2e8f0;
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: auto;
 }
 
 .restaurant-card:hover {
@@ -710,6 +819,11 @@
   min-width: 120px;
 }
 
+.visit-button-bottom {
+  margin-top: auto;
+  width: 100%;
+}
+
 .show-more {
   text-align: center;
   padding: 2rem 0;
@@ -736,16 +850,111 @@
   background: #059669;
 }
 
+/* New restaurant controls grid layout */
+.restaurant-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.control-button {
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  color: #64748b;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.control-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Visited button with profile-specific colors */
+.visited-button.julien-profile.active {
+  background: #fb923c; /* Orange for Julien */
+  color: white;
+  border-color: #fb923c;
+}
+
+.visited-button.jimmy-profile.active {
+  background: #fbbf24; /* Yellow for Jimmy */
+  color: white;
+  border-color: #fbbf24;
+}
+
+.visited-button.julien-profile:hover {
+  border-color: #fb923c;
+  color: #fb923c;
+}
+
+.visited-button.jimmy-profile:hover {
+  border-color: #fbbf24;
+  color: #fbbf24;
+}
+
+/* Interested button */
+.interested-button.active {
+  background: #10b981; /* Green */
+  color: white;
+  border-color: #10b981;
+}
+
+.interested-button:hover {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+/* Not interested button */
+.not-interested-button.active {
+  background: #dc2626; /* Red */
+  color: white;
+  border-color: #dc2626;
+}
+
+.not-interested-button:hover {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 480px) {
+  .control-button {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.5rem;
+  }
+
+  .restaurant-controls-grid {
+    gap: 0.25rem;
+  }
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .restaurants-container {
     padding: 1rem 0;
   }
 
-  .map-header,
+  .map-header {
+    margin: 0 0.5rem 1rem 0.5rem;
+    max-width: none;
+  }
+
   .restaurant-map,
   .restaurant-list {
     margin: 0 0.5rem 1rem 0.5rem;
+    max-width: none;
+    width: calc(100% - 1rem);
   }
 
   .map-header h1 {

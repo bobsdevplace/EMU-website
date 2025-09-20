@@ -87,7 +87,7 @@ function App() {
           </div>
           <div className="nav-links">
             <a href="#features" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); }}>Features</a>
-            <a href="#map" onClick={(e) => { e.preventDefault(); setCurrentPage('map'); }}>Sydney Map</a>
+            <a href="#map" onClick={(e) => { e.preventDefault(); setCurrentPage('map'); }}>Map</a>
             <a href="#restaurants" onClick={(e) => { e.preventDefault(); setCurrentPage('restaurants'); }}>Restaurants</a>
             <a href="#about" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); }}>About</a>
             <a href="#contact" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); }}>Contact</a>
