@@ -10,7 +10,8 @@
       "Bash(npm start)",
       "Bash(npm run build:*)",
       "Bash(PORT=3000 npm start)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []
