@@ -4,6 +4,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Import routes
 import restaurantRoutes from './routes/restaurants.js';
@@ -12,6 +14,9 @@ import socialRoutes from './routes/social.js';
 
 // Load environment variables
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -61,18 +66,16 @@ app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/social', socialRoutes);
 
-// Root endpoint
-app.get('/', (req, res) => {
-  res.json({
-    message: 'EMU Restaurant Tracker API',
-    version: '1.0.0',
-    endpoints: {
-      restaurants: '/api/restaurants',
-      users: '/api/users',
-      social: '/api/social',
-      health: '/health'
-    }
-  });
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// The "catchall" handler: send back React's index.html file for any non-API routes
+app.get('*', (req, res) => {
+  // Don't serve index.html for API routes
+  if (req.path.startsWith('/api/') || req.path === '/health') {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 // Error handling middleware
@@ -84,10 +87,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
-});
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
