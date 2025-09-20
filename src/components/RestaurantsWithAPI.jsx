@@ -206,6 +206,23 @@ const RestaurantsWithAPI = ({ loggedInUser }) => {
     }
   }
 
+  const clearSocialFeed = async () => {
+    if (!confirm('Are you sure you want to clear all social feed entries? This cannot be undone.')) {
+      return
+    }
+
+    try {
+      const result = await apiService.clearSocialFeed()
+      if (result.success) {
+        setSocialFeed([])
+        setError(null)
+      }
+    } catch (error) {
+      console.error('Error clearing social feed:', error)
+      setError('Failed to clear social feed')
+    }
+  }
+
   const loadAvailableUsers = async () => {
     try {
       const usersData = await apiService.getAllUsers()
@@ -816,15 +833,24 @@ out center;`
         {/* Social Feed */}
         {showFeed && (
           <div className="social-feed">
-            <h3>Recent Restaurant Visits</h3>
+            <div className="social-feed-header">
+              <h3>Recent Activity</h3>
+              {socialFeed.length > 0 && (
+                <button onClick={clearSocialFeed} className="clear-feed-btn">
+                  Clear Feed
+                </button>
+              )}
+            </div>
             {socialFeed.length === 0 ? (
-              <p className="no-feed">No recent visits. Start exploring restaurants!</p>
+              <p className="no-feed">No recent activity. Start exploring restaurants!</p>
             ) : (
               <div className="feed-entries">
                 {socialFeed.slice(0, 10).map(entry => (
                   <div key={entry.id} className="feed-entry">
                     <span className="feed-user">{entry.user}</span>
-                    <span className="feed-action">has visited</span>
+                    <span className="feed-action">
+                      {entry.action === 'commented' ? 'commented on' : 'has visited'}
+                    </span>
                     <span className="feed-restaurant">{entry.restaurantName}</span>
                     <span className="feed-date">on {entry.date}</span>
                   </div>
@@ -1066,6 +1092,8 @@ out center;`
                 <RestaurantComments
                   restaurantId={restaurant.id}
                   currentUser={currentUser}
+                  restaurantName={restaurant.name}
+                  onSocialFeedUpdate={loadSocialFeed}
                 />
               </div>
             </Popup>

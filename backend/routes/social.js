@@ -124,4 +124,20 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Clear all social feed entries
+router.delete('/', async (req, res) => {
+  try {
+    const result = await SocialFeed.deleteMany({});
+
+    res.json({
+      success: true,
+      message: `Cleared ${result.deletedCount} social feed entries`,
+      deletedCount: result.deletedCount
+    });
+  } catch (error) {
+    console.error('Error clearing social feed:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

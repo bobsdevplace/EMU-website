@@ -129,6 +129,12 @@ class ApiService {
     });
   }
 
+  async clearSocialFeed() {
+    return this.request('/social', {
+      method: 'DELETE'
+    });
+  }
+
   // Comment methods
   async getRestaurantComments(restaurantId, limit = 20, offset = 0) {
     const params = new URLSearchParams({

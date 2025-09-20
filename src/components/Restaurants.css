@@ -1059,7 +1059,7 @@
   max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
-  width: calc(100% - 1.5rem);
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -1241,4 +1241,31 @@
 
 .restaurant-popup .comments-list {
   max-height: 150px;
+}
+
+/* Social Feed Styles */
+.social-feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.social-feed-header h3 {
+  margin: 0;
+}
+
+.clear-feed-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clear-feed-btn:hover {
+  background: #dc2626;
 }

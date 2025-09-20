@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import apiService from '../services/api.js';
 
-const RestaurantComments = ({ restaurantId, currentUser }) => {
+const RestaurantComments = ({ restaurantId, currentUser, restaurantName, onSocialFeedUpdate }) => {
   const [comments, setComments] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -63,6 +63,21 @@ const RestaurantComments = ({ restaurantId, currentUser }) => {
         setNewRating(null);
         await loadComments();
         await loadCommentStats();
+
+        // Add to social feed
+        if (onSocialFeedUpdate && restaurantName) {
+          try {
+            await apiService.addSocialFeedEntry(
+              currentUser,
+              restaurantName,
+              restaurantId,
+              'commented'
+            );
+            onSocialFeedUpdate(); // Refresh the social feed
+          } catch (socialError) {
+            console.error('Error adding comment to social feed:', socialError);
+          }
+        }
       }
     } catch (error) {
       console.error('Error adding comment:', error);
