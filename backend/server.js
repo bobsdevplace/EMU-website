@@ -53,8 +53,10 @@ const corsOptions = {
   origin: [
     'http://localhost:3000',
     'http://localhost:5173', // Vite dev server
-    'https://pepit.github.io', // GitHub Pages
-    'https://pepit.github.io/EMU-website' // GitHub Pages with repo name
+    'https://pepit.github.io', // GitHub Pages root
+    'https://pepit.github.io/EMU-website', // GitHub Pages with repo name
+    /^https:\/\/.*\.github\.io$/, // Allow any GitHub Pages subdomain
+    /^https:\/\/.*\.github\.io\/.*$/ // Allow any GitHub Pages with path
   ],
   credentials: true,
   optionsSuccessStatus: 200
