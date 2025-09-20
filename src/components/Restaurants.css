@@ -1035,6 +1035,7 @@
   justify-content: space-between;
   font-size: 0.875rem;
   transition: all 0.2s;
+  color: #000000;
 }
 
 .comments-toggle:hover {
@@ -1057,6 +1058,9 @@
   padding: 0.75rem;
   max-height: 300px;
   overflow-y: auto;
+  overflow-x: hidden;
+  width: calc(100% - 1.5rem);
+  box-sizing: border-box;
 }
 
 .add-comment {
@@ -1074,14 +1078,16 @@
 
 .rating-input {
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .rating-input label {
-  display: block;
   font-size: 0.75rem;
   font-weight: 500;
   color: #6b7280;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0;
 }
 
 .stars {
@@ -1090,7 +1096,7 @@
 }
 
 .star {
-  font-size: 1.25rem;
+  font-size: 1.875rem;
   color: #d1d5db;
   transition: color 0.2s;
 }
@@ -1116,6 +1122,7 @@
   resize: vertical;
   min-height: 60px;
   font-family: inherit;
+  box-sizing: border-box;
 }
 
 .add-comment textarea:focus {
@@ -1196,7 +1203,7 @@
 }
 
 .comment-rating .stars {
-  font-size: 1.125rem;
+  font-size: 1.6875rem;
 }
 
 .comment-text {
