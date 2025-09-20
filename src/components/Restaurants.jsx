@@ -49,10 +49,18 @@ const Restaurants = () => {
   })
   const [isSearching, setIsSearching] = useState(false)
 
-  // localStorage helper functions
-  const loadVisitedRestaurants = () => {
+  // User profile and social feed state
+  const [currentUser, setCurrentUser] = useState('Julien')
+  const [socialFeed, setSocialFeed] = useState([])
+  const [showFeed, setShowFeed] = useState(false)
+
+  // Available users
+  const users = ['Julien', 'Jimmy']
+
+  // User-specific localStorage helper functions
+  const loadVisitedRestaurants = (user = currentUser) => {
     try {
-      const visited = localStorage.getItem('visitedRestaurants')
+      const visited = localStorage.getItem(`visitedRestaurants_${user}`)
       return visited ? new Set(JSON.parse(visited)) : new Set()
     } catch (error) {
       console.error('Error loading visited restaurants:', error)
@@ -60,23 +68,75 @@ const Restaurants = () => {
     }
   }
 
-  const saveVisitedRestaurants = (visitedSet) => {
+  const saveVisitedRestaurants = (visitedSet, user = currentUser) => {
     try {
-      localStorage.setItem('visitedRestaurants', JSON.stringify([...visitedSet]))
+      localStorage.setItem(`visitedRestaurants_${user}`, JSON.stringify([...visitedSet]))
     } catch (error) {
       console.error('Error saving visited restaurants:', error)
     }
   }
 
+  // Social feed localStorage functions
+  const loadSocialFeed = () => {
+    try {
+      const feed = localStorage.getItem('socialFeed')
+      return feed ? JSON.parse(feed) : []
+    } catch (error) {
+      console.error('Error loading social feed:', error)
+      return []
+    }
+  }
+
+  const saveSocialFeed = (feedEntries) => {
+    try {
+      localStorage.setItem('socialFeed', JSON.stringify(feedEntries))
+    } catch (error) {
+      console.error('Error saving social feed:', error)
+    }
+  }
+
+  const addFeedEntry = (user, restaurantName, restaurantId, action = 'visited') => {
+    const newEntry = {
+      id: Date.now(),
+      user: user,
+      restaurantName: restaurantName,
+      restaurantId: restaurantId,
+      action: action,
+      timestamp: new Date().toISOString(),
+      date: new Date().toLocaleDateString()
+    }
+
+    const currentFeed = loadSocialFeed()
+    const updatedFeed = [newEntry, ...currentFeed].slice(0, 50) // Keep only last 50 entries
+    setSocialFeed(updatedFeed)
+    saveSocialFeed(updatedFeed)
+  }
+
   const toggleVisitedRestaurant = (restaurantId) => {
+    const restaurant = allRestaurants.find(r => r.id === restaurantId)
     const newVisited = new Set(visitedRestaurants)
+
     if (newVisited.has(restaurantId)) {
       newVisited.delete(restaurantId)
+      // Could add "unvisited" feed entry if needed
     } else {
       newVisited.add(restaurantId)
+      // Add to social feed
+      if (restaurant) {
+        addFeedEntry(currentUser, restaurant.name, restaurantId, 'visited')
+      }
     }
+
     setVisitedRestaurants(newVisited)
-    saveVisitedRestaurants(newVisited)
+    saveVisitedRestaurants(newVisited, currentUser)
+  }
+
+  // Switch user function
+  const switchUser = (newUser) => {
+    setCurrentUser(newUser)
+    // Load the new user's visited restaurants
+    const newUserVisited = loadVisitedRestaurants(newUser)
+    setVisitedRestaurants(newUserVisited)
   }
 
   const isRestaurantVisited = (restaurantId) => {
@@ -580,8 +640,10 @@ out center;`
   }
 
   useEffect(() => {
-    // Load visited restaurants from localStorage
-    setVisitedRestaurants(loadVisitedRestaurants())
+    // Load visited restaurants from localStorage for current user
+    setVisitedRestaurants(loadVisitedRestaurants(currentUser))
+    // Load social feed
+    setSocialFeed(loadSocialFeed())
     fetchRestaurants()
   }, [])
 
@@ -618,11 +680,59 @@ out center;`
   return (
     <div className="restaurants-container">
       <div className="map-header">
-        <h1>Restaurants near {currentLocation.name.split(',')[0]}</h1>
-        <p>Discover restaurants within {searchRadius/1000}km of {currentLocation.name}</p>
+        <div className="header-top">
+          <div className="header-title">
+            <h1>Restaurants near {currentLocation.name.split(',')[0]}</h1>
+            <p>Discover restaurants within {searchRadius/1000}km of {currentLocation.name}</p>
+          </div>
+
+          <div className="user-controls">
+            <div className="user-switcher">
+              <label className="user-label">Signed in as:</label>
+              <select
+                value={currentUser}
+                onChange={(e) => switchUser(e.target.value)}
+                className="user-select"
+              >
+                {users.map(user => (
+                  <option key={user} value={user}>{user}</option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              onClick={() => setShowFeed(!showFeed)}
+              className={`feed-toggle ${showFeed ? 'active' : ''}`}
+            >
+              {showFeed ? '📍 Hide Feed' : '📍 Show Feed'} ({socialFeed.length})
+            </button>
+          </div>
+        </div>
+
         <p className="restaurant-count">
           Found {restaurants.length} of {allRestaurants.length} restaurants
         </p>
+
+        {/* Social Feed */}
+        {showFeed && (
+          <div className="social-feed">
+            <h3>Recent Restaurant Visits</h3>
+            {socialFeed.length === 0 ? (
+              <p className="no-feed">No recent visits. Start exploring restaurants!</p>
+            ) : (
+              <div className="feed-entries">
+                {socialFeed.slice(0, 10).map(entry => (
+                  <div key={entry.id} className="feed-entry">
+                    <span className="feed-user">{entry.user}</span>
+                    <span className="feed-action">has visited</span>
+                    <span className="feed-restaurant">{entry.restaurantName}</span>
+                    <span className="feed-date">on {entry.date}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Location Search */}
         <div className="location-search-container">
