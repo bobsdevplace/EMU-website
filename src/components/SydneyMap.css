@@ -12,13 +12,13 @@
 
 .map-header h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: var(--text-dark);
   margin-bottom: 0.5rem;
 }
 
 .map-header p {
   font-size: 1.2rem;
-  color: #666;
+  color: var(--text-medium);
   max-width: 600px;
   margin: 0 auto;
 }
@@ -35,19 +35,19 @@
 
 .restaurant-popup h3 {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: var(--text-dark);
   font-size: 1.1rem;
 }
 
 .restaurant-popup .cuisine {
   margin: 0 0 0.5rem 0;
-  color: #666;
+  color: var(--text-medium);
   font-style: italic;
 }
 
 .restaurant-popup .address {
   margin: 0 0 0.5rem 0;
-  color: #777;
+  color: var(--text-light);
   font-size: 0.9rem;
 }
 

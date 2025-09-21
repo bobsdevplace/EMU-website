@@ -23,6 +23,23 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Dark Mode Theme */
+[data-theme="dark"] {
+  /* EMU Dark Theme - Dark backgrounds with blue accents */
+  --primary-blue: #60a5fa;
+  --light-blue: #3b82f6;
+  --pale-blue: #1e3a8a;
+  --white: #0f172a;
+  --off-white: #1e293b;
+  --text-dark: #f1f5f9;
+  --text-medium: #cbd5e1;
+  --text-light: #94a3b8;
+
+  color-scheme: dark;
+  color: var(--text-dark);
+  background-color: var(--white);
+}
+
 a {
   font-weight: 500;
   color: var(--primary-blue);

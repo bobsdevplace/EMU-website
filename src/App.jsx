@@ -12,16 +12,24 @@ function App() {
   const [useAPI, setUseAPI] = useState(true) // Toggle between localStorage and MongoDB
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [loggedInUser, setLoggedInUser] = useState(null)
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
-  // Load logged-in user from localStorage on app initialization
+  // Load logged-in user and dark mode preference from localStorage on app initialization
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem('loggedInUser')
       if (savedUser) {
         setLoggedInUser(savedUser)
       }
+
+      const savedTheme = localStorage.getItem('darkMode')
+      if (savedTheme) {
+        const isDark = savedTheme === 'true'
+        setIsDarkMode(isDark)
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
+      }
     } catch (error) {
-      console.error('Error loading user from localStorage:', error)
+      console.error('Error loading data from localStorage:', error)
     }
   }, [])
 
@@ -42,6 +50,21 @@ function App() {
       localStorage.removeItem('loggedInUser')
     } catch (error) {
       console.error('Error removing user from localStorage:', error)
+    }
+  }
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !isDarkMode
+    setIsDarkMode(newDarkMode)
+
+    // Update the data-theme attribute on the document element
+    document.documentElement.setAttribute('data-theme', newDarkMode ? 'dark' : 'light')
+
+    // Save to localStorage
+    try {
+      localStorage.setItem('darkMode', newDarkMode.toString())
+    } catch (error) {
+      console.error('Error saving dark mode preference:', error)
     }
   }
 
@@ -174,6 +197,24 @@ function App() {
               }}
             >
               {useAPI ? 'MongoDB' : 'LocalStorage'}
+            </button>
+            <button
+              onClick={toggleDarkMode}
+              style={{
+                background: isDarkMode ? '#fbbf24' : '#374151',
+                color: 'white',
+                border: 'none',
+                padding: '8px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              {isDarkMode ? '☀️' : '🌙'}
+              {isDarkMode ? 'Light' : 'Dark'}
             </button>
           </div>
         </div>

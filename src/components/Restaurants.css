@@ -1,13 +1,13 @@
 .restaurants-container {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--off-white);
   padding: 2rem 0;
 }
 
 .map-header {
   text-align: center;
   padding: 2rem;
-  background: white;
+  background: var(--white);
   margin: 0 auto 2rem auto;
   max-width: 1200px;
   border-radius: 12px;
@@ -47,32 +47,32 @@
 
 .user-label {
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--text-light);
   font-weight: 500;
 }
 
 .user-select {
   padding: 0.5rem 0.75rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--pale-blue);
   border-radius: 6px;
-  background: white;
+  background: var(--white);
   font-size: 0.9rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-dark);
   cursor: pointer;
   transition: border-color 0.2s;
 }
 
 .user-select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--primary-blue);
 }
 
 .feed-toggle {
   padding: 0.5rem 1rem;
-  background: #f1f5f9;
-  color: #475569;
-  border: 2px solid #e2e8f0;
+  background: var(--off-white);
+  color: var(--text-medium);
+  border: 2px solid var(--pale-blue);
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -81,33 +81,33 @@
 }
 
 .feed-toggle:hover {
-  background: #e2e8f0;
-  border-color: #cbd5e1;
+  background: var(--pale-blue);
+  border-color: var(--light-blue);
 }
 
 .feed-toggle.active {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
+  background: var(--primary-blue);
+  color: var(--white);
+  border-color: var(--primary-blue);
 }
 
 .social-feed {
   margin-top: 1.5rem;
   padding: 1.5rem;
-  background: #f8fafc;
+  background: var(--off-white);
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--pale-blue);
   text-align: left;
 }
 
 .social-feed h3 {
   margin: 0 0 1rem 0;
-  color: #1e293b;
+  color: var(--text-dark);
   font-size: 1.1rem;
 }
 
 .no-feed {
-  color: #64748b;
+  color: var(--text-light);
   font-style: italic;
   margin: 0;
 }
@@ -120,9 +120,9 @@
 
 .feed-entry {
   padding: 0.75rem;
-  background: white;
+  background: var(--white);
   border-radius: 6px;
-  border-left: 3px solid #3b82f6;
+  border-left: 3px solid var(--primary-blue);
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
@@ -131,20 +131,20 @@
 
 .feed-user {
   font-weight: 600;
-  color: #3b82f6;
+  color: var(--primary-blue);
 }
 
 .feed-action {
-  color: #64748b;
+  color: var(--text-light);
 }
 
 .feed-restaurant {
   font-weight: 500;
-  color: #1e293b;
+  color: var(--text-dark);
 }
 
 .feed-date {
-  color: #64748b;
+  color: var(--text-light);
   margin-left: auto;
 }
 
@@ -175,21 +175,21 @@
 }
 
 .map-header h1 {
-  color: #1e293b;
+  color: var(--text-dark);
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
   font-weight: 700;
 }
 
 .map-header p {
-  color: #64748b;
+  color: var(--text-light);
   font-size: 1.1rem;
   margin: 0.5rem 0;
 }
 
 .restaurant-count {
-  background: #3b82f6 !important;
-  color: white !important;
+  background: var(--primary-blue) !important;
+  color: var(--white) !important;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   display: inline-block;
@@ -201,9 +201,9 @@
 .location-search-container {
   margin: 2rem auto;
   padding: 1.5rem;
-  background: #f1f5f9;
+  background: var(--off-white);
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--pale-blue);
   max-width: 800px;
 }
 
@@ -227,7 +227,7 @@
 
 .search-label {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-dark);
   font-size: 0.9rem;
 }
 
@@ -241,22 +241,24 @@
 .location-input {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--pale-blue);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  background: var(--white);
+  color: var(--text-dark);
 }
 
 .location-input:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .search-button {
   padding: 0.75rem 1.5rem;
-  background: #3b82f6;
-  color: white;
+  background: var(--primary-blue);
+  color: var(--white);
   border: none;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -267,19 +269,19 @@
 }
 
 .search-button:hover:not(:disabled) {
-  background: #2563eb;
+  background: var(--light-blue);
 }
 
 .search-button:disabled {
-  background: #94a3b8;
+  background: var(--text-light);
   cursor: not-allowed;
 }
 
 .save-location-button {
   padding: 0.75rem 1rem;
-  background: #f8fafc;
-  color: #64748b;
-  border: 2px solid #e2e8f0;
+  background: var(--off-white);
+  color: var(--text-light);
+  border: 2px solid var(--pale-blue);
   border-radius: 8px;
   font-size: 1.2rem;
   cursor: pointer;
@@ -292,13 +294,13 @@
 }
 
 .save-location-button:hover:not(:disabled) {
-  background: #e2e8f0;
-  border-color: #cbd5e1;
+  background: var(--pale-blue);
+  border-color: var(--light-blue);
   transform: scale(1.05);
 }
 
 .save-location-button:disabled {
-  background: #f1f5f9;
+  background: var(--off-white);
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -324,17 +326,18 @@
 
 .radius-select {
   padding: 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--pale-blue);
   border-radius: 8px;
   font-size: 1rem;
-  background: white;
+  background: var(--white);
+  color: var(--text-dark);
   cursor: pointer;
   transition: border-color 0.2s;
 }
 
 .radius-select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -355,7 +358,7 @@
 }
 
 .preset-locations {
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--pale-blue);
   padding-top: 1.5rem;
   text-align: center;
   display: flex;
@@ -366,7 +369,7 @@
 
 .preset-label {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-dark);
   margin-bottom: 0.75rem;
   font-size: 1.1rem;
   text-align: center;
@@ -387,9 +390,9 @@
 
 .preset-button {
   padding: 0.5rem 1rem;
-  background: white;
-  color: #475569;
-  border: 2px solid #e2e8f0;
+  background: var(--white);
+  color: var(--text-medium);
+  border: 2px solid var(--pale-blue);
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 500;
@@ -398,14 +401,14 @@
 }
 
 .preset-button:hover {
-  border-color: #3b82f6;
-  color: #3b82f6;
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
 }
 
 .preset-button.active {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
+  background: var(--primary-blue);
+  color: var(--white);
+  border-color: var(--primary-blue);
 }
 
 .remove-location-button {
@@ -477,7 +480,7 @@
 
 .filter-label {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-dark);
   font-size: 1rem;
 }
 
@@ -485,11 +488,11 @@
 .cuisine-filter,
 .visit-filter {
   padding: 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--pale-blue);
   border-radius: 8px;
-  background: white;
+  background: var(--white);
   font-size: 1rem;
-  color: #1e293b;
+  color: var(--text-dark);
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s;
   min-width: 200px;
@@ -498,14 +501,14 @@
 .type-filter:hover,
 .cuisine-filter:hover,
 .visit-filter:hover {
-  border-color: #3b82f6;
+  border-color: var(--primary-blue);
 }
 
 .type-filter:focus,
 .cuisine-filter:focus,
 .visit-filter:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -539,7 +542,7 @@
 .error-container {
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--white);
   margin: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -588,7 +591,7 @@
 }
 
 .restaurant-popup h3 {
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0 0 0.5rem 0;
   font-size: 1.2rem;
 }
@@ -596,7 +599,7 @@
 .restaurant-popup p {
   margin: 0.25rem 0;
   font-size: 0.9rem;
-  color: #475569;
+  color: var(--text-medium);
 }
 
 .restaurant-popup .type {
@@ -610,7 +613,7 @@
 }
 
 .restaurant-popup .website a {
-  color: #3b82f6;
+  color: var(--primary-blue);
   text-decoration: none;
   font-weight: 500;
 }
@@ -643,8 +646,8 @@
 }
 
 .visit-button {
-  background: #3b82f6;
-  color: white;
+  background: var(--primary-blue);
+  color: var(--white);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -656,7 +659,7 @@
 }
 
 .visit-button:hover {
-  background: #2563eb;
+  background: var(--light-blue);
 }
 
 .visit-button.visited {
@@ -701,7 +704,7 @@
 
 .restaurant-list {
   margin: 3rem auto 2rem auto;
-  background: white;
+  background: var(--white);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -710,7 +713,7 @@
 }
 
 .restaurant-list h2 {
-  color: #1e293b;
+  color: var(--text-dark);
   font-size: 2rem;
   margin-bottom: 1.5rem;
   text-align: center;
@@ -724,10 +727,10 @@
 }
 
 .restaurant-card {
-  background: #f8fafc;
+  background: var(--off-white);
   padding: 1.5rem 1.5rem 1rem 1.5rem;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--pale-blue);
   transition: transform 0.2s, box-shadow 0.2s;
   display: flex;
   flex-direction: column;
@@ -735,8 +738,8 @@
 }
 
 .restaurant-card.alternate {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: var(--off-white);
+  border-color: var(--light-blue);
 }
 
 .restaurant-card:hover {
@@ -771,8 +774,8 @@
 
 .card-hours {
   font-size: 0.8rem;
-  color: #64748b;
-  background: #f1f5f9;
+  color: var(--text-light);
+  background: var(--off-white);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   text-align: center;
@@ -781,14 +784,14 @@
 }
 
 .card-header h3 {
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0;
   font-size: 1.3rem;
   font-weight: 600;
 }
 
 .restaurant-card h3 {
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0 0 0.5rem 0;
   font-size: 1.3rem;
   font-weight: 600;
@@ -802,7 +805,7 @@
 }
 
 .restaurant-card .cuisine {
-  color: #3b82f6;
+  color: var(--primary-blue);
   font-weight: 600;
   margin: 0.25rem 0;
 }
@@ -810,7 +813,7 @@
 .restaurant-card .address,
 .restaurant-card .phone,
 .restaurant-card .hours {
-  color: #64748b;
+  color: var(--text-light);
   margin: 0.25rem 0;
   font-size: 0.9rem;
 }
@@ -829,8 +832,8 @@
 
 .website-link {
   display: inline-block;
-  background: #3b82f6;
-  color: white;
+  background: var(--primary-blue);
+  color: var(--white);
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -842,7 +845,7 @@
 }
 
 .website-link:hover {
-  background: #2563eb;
+  background: var(--light-blue);
 }
 
 .card-actions .visit-button {
@@ -859,11 +862,11 @@
 .show-more {
   text-align: center;
   padding: 2rem 0;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--pale-blue);
 }
 
 .show-more p {
-  color: #64748b;
+  color: var(--text-light);
   margin-bottom: 1rem;
 }
 
@@ -895,14 +898,14 @@
 
 .control-button {
   padding: 0.5rem 0.75rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--pale-blue);
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  background: white;
-  color: #64748b;
+  background: var(--white);
+  color: var(--text-light);
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -1019,13 +1022,13 @@
 /* Restaurant Comments Styles */
 .restaurant-comments {
   margin-top: 0.75rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--pale-blue);
   padding-top: 0.75rem;
 }
 
 .comments-toggle {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--off-white);
+  border: 1px solid var(--pale-blue);
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
   cursor: pointer;
@@ -1035,12 +1038,12 @@
   justify-content: space-between;
   font-size: 0.875rem;
   transition: all 0.2s;
-  color: #000000;
+  color: var(--text-dark);
 }
 
 .comments-toggle:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: var(--pale-blue);
+  border-color: var(--light-blue);
 }
 
 .average-rating {
@@ -1048,12 +1051,12 @@
   align-items: center;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-light);
 }
 
 .comments-section {
   margin-top: 0.75rem;
-  background: #f8fafc;
+  background: var(--off-white);
   border-radius: 8px;
   padding: 0.75rem;
   max-height: 300px;
@@ -1066,7 +1069,7 @@
 .add-comment {
   margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--pale-blue);
 }
 
 .add-comment h4 {
@@ -1115,7 +1118,7 @@
 
 .add-comment textarea {
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--pale-blue);
   border-radius: 4px;
   padding: 0.5rem;
   font-size: 0.875rem;
@@ -1123,12 +1126,14 @@
   min-height: 60px;
   font-family: inherit;
   box-sizing: border-box;
+  background: var(--white);
+  color: var(--text-dark);
 }
 
 .add-comment textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 1px #3b82f6;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 1px var(--primary-blue);
 }
 
 .comment-actions {
@@ -1144,8 +1149,8 @@
 }
 
 .add-comment-btn {
-  background: #3b82f6;
-  color: white;
+  background: var(--primary-blue);
+  color: var(--white);
   border: none;
   border-radius: 4px;
   padding: 0.375rem 0.75rem;
@@ -1169,11 +1174,11 @@
 }
 
 .comment {
-  background: white;
+  background: var(--white);
   border-radius: 6px;
   padding: 0.75rem;
   margin-bottom: 0.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--pale-blue);
 }
 
 .comment:last-child {
