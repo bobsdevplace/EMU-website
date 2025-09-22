@@ -262,6 +262,15 @@ const Restaurants = ({ loggedInUser }) => {
     saveSocialFeed(updatedFeed)
   }
 
+  const removeFeedEntry = (user, restaurantId) => {
+    const currentFeed = loadSocialFeed()
+    const updatedFeed = currentFeed.filter(entry =>
+      !(entry.user === user && entry.restaurantId === restaurantId && entry.action === 'visited')
+    )
+    setSocialFeed(updatedFeed)
+    saveSocialFeed(updatedFeed)
+  }
+
   // Saved locations localStorage functions
   const loadSavedLocations = () => {
     try {
@@ -314,7 +323,8 @@ const Restaurants = ({ loggedInUser }) => {
 
     if (newVisited.has(restaurantId)) {
       newVisited.delete(restaurantId)
-      // Could add "unvisited" feed entry if needed
+      // Remove from social feed when unchecked
+      removeFeedEntry(currentUser, restaurantId)
     } else {
       newVisited.add(restaurantId)
       // Add to social feed
@@ -470,6 +480,12 @@ const Restaurants = ({ loggedInUser }) => {
   way[amenity=cafe](around:${radius},${lat},${lon});
   node[amenity=fast_food](around:${radius},${lat},${lon});
   way[amenity=fast_food](around:${radius},${lat},${lon});
+  node[amenity=bar](around:${radius},${lat},${lon});
+  way[amenity=bar](around:${radius},${lat},${lon});
+  node[amenity=pub](around:${radius},${lat},${lon});
+  way[amenity=pub](around:${radius},${lat},${lon});
+  node[amenity=nightclub](around:${radius},${lat},${lon});
+  way[amenity=nightclub](around:${radius},${lat},${lon});
 );
 out center;`
 
@@ -662,6 +678,12 @@ out center;`
           displayType = 'Fast Food'
         } else if (normalizedType.includes('cafe') || normalizedType.includes('café')) {
           displayType = 'Cafe'
+        } else if (normalizedType.includes('bar')) {
+          displayType = 'Bar'
+        } else if (normalizedType.includes('pub')) {
+          displayType = 'Pub'
+        } else if (normalizedType.includes('nightclub')) {
+          displayType = 'Nightclub'
         }
 
         typeCount.set(displayType, (typeCount.get(displayType) || 0) + 1)
@@ -697,6 +719,12 @@ out center;`
           return normalizedType.includes('fast') || normalizedType.includes('fast_food')
         } else if (filterType === 'cafe') {
           return normalizedType.includes('cafe') || normalizedType.includes('café')
+        } else if (filterType === 'bar') {
+          return normalizedType.includes('bar')
+        } else if (filterType === 'pub') {
+          return normalizedType.includes('pub')
+        } else if (filterType === 'nightclub') {
+          return normalizedType.includes('nightclub')
         }
         return restaurant.type.toLowerCase().includes(filterType)
       })
@@ -873,6 +901,7 @@ out center;`
       fast_food: '🍔',
       bar: '🍻',
       pub: '🍺',
+      nightclub: '🎭',
       food_court: '🍽️',
       bistro: '🍽️',
       diner: '🍽️',

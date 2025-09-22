@@ -596,6 +596,11 @@
   font-size: 1.2rem;
 }
 
+/* Dark mode fix for restaurant popup titles */
+[data-theme="dark"] .restaurant-popup h3 {
+  color: #000000;
+}
+
 .restaurant-popup p {
   margin: 0.25rem 0;
   font-size: 0.9rem;
