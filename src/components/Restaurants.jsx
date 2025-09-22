@@ -758,6 +758,28 @@ out center;`
     filterRestaurants(selectedCuisine, selectedType, visitStatus)
   }
 
+  // Get dynamic count text based on selected filter
+  const getCountText = () => {
+    const count = restaurants.length
+
+    if (selectedType === 'all') {
+      return `Found ${count} establishment${count !== 1 ? 's' : ''}`
+    }
+
+    // Convert filter type to plural form
+    const pluralTypes = {
+      'Restaurant': 'restaurants',
+      'Fast Food': 'fast food places',
+      'Cafe': 'cafes',
+      'Bar': 'bars',
+      'Pub': 'pubs',
+      'Nightclub': 'nightclubs'
+    }
+
+    const pluralType = pluralTypes[selectedType] || `${selectedType.toLowerCase()}s`
+    return `Found ${count} ${pluralType}`
+  }
+
   // Handle location search
   const handleLocationSearch = async () => {
     if (!searchLocation.trim()) {
@@ -1053,7 +1075,7 @@ out center;`
       <div className="map-header">
         <div className="header-top">
           <div className="header-title">
-            <h1>Restaurants near {currentLocation.name.split(',')[0]} {getCountryFlag(currentLocation.name)}</h1>
+            <h1>Establishments near {currentLocation.name.split(',')[0]} {getCountryFlag(currentLocation.name)}</h1>
           </div>
 
           <div className="user-controls">
@@ -1067,7 +1089,7 @@ out center;`
         </div>
 
         <p className="restaurant-count">
-          Found {restaurants.length} restaurants
+          {getCountText()}
         </p>
 
         {/* Social Feed */}
