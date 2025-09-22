@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import apiService from '../services/api.js'
+import RestaurantComments from './RestaurantComments.jsx'
 
 // Fix for default markers in Vite/React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -48,7 +50,6 @@ const redIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-// Default grey marker for unvisited restaurants
 const greyIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -58,7 +59,7 @@ const greyIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-const Restaurants = ({ loggedInUser }) => {
+const Establishments = ({ loggedInUser }) => {
   const [restaurants, setRestaurants] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -72,7 +73,7 @@ const Restaurants = ({ loggedInUser }) => {
 
   // Location and search state
   const [searchLocation, setSearchLocation] = useState('Manly Beach, Australia')
-  const [searchRadius, setSearchRadius] = useState(1000) // in meters
+  const [searchRadius, setSearchRadius] = useState(1000) // Changed from 5000 to 1000
   const [currentLocation, setCurrentLocation] = useState({
     name: 'Manly Beach, Australia',
     coordinates: [-33.797286, 151.287778]
@@ -83,6 +84,8 @@ const Restaurants = ({ loggedInUser }) => {
   const [socialFeed, setSocialFeed] = useState([])
   const [showFeed, setShowFeed] = useState(false)
   const [savedLocations, setSavedLocations] = useState([])
+  const [availableUsers, setAvailableUsers] = useState(['Julien', 'Jimmy'])
+  const [allUsersVisitedRestaurants, setAllUsersVisitedRestaurants] = useState({})
 
   // Use the logged-in user
   const currentUser = loggedInUser
@@ -171,236 +174,232 @@ const Restaurants = ({ loggedInUser }) => {
     return '🌍' // Default world emoji
   }
 
-  // User-specific localStorage helper functions
-  const loadVisitedRestaurants = (user = currentUser) => {
+  // API calls
+  const loadUserData = async (username) => {
     try {
-      const visited = localStorage.getItem(`visitedRestaurants_${user}`)
-      return visited ? new Set(JSON.parse(visited)) : new Set()
+      const userData = await apiService.getUser(username)
+      if (userData.success) {
+        setVisitedRestaurants(new Set(userData.data.visitedRestaurants))
+        setInterestedRestaurants(new Set(userData.data.interestedRestaurants))
+        setNotInterestedRestaurants(new Set(userData.data.notInterestedRestaurants))
+        setSavedLocations(userData.data.savedLocations || [])
+      }
     } catch (error) {
-      console.error('Error loading visited restaurants:', error)
-      return new Set()
+      console.error('Error loading user data:', error)
+      // Fall back to empty data if API fails
+      setVisitedRestaurants(new Set())
+      setInterestedRestaurants(new Set())
+      setNotInterestedRestaurants(new Set())
+      setSavedLocations([])
     }
   }
 
-  const saveVisitedRestaurants = (visitedSet, user = currentUser) => {
+  const loadSocialFeed = async () => {
     try {
-      localStorage.setItem(`visitedRestaurants_${user}`, JSON.stringify([...visitedSet]))
-    } catch (error) {
-      console.error('Error saving visited restaurants:', error)
-    }
-  }
-
-  const loadInterestedRestaurants = (user = currentUser) => {
-    try {
-      const interested = localStorage.getItem(`interestedRestaurants_${user}`)
-      return interested ? new Set(JSON.parse(interested)) : new Set()
-    } catch (error) {
-      console.error('Error loading interested restaurants:', error)
-      return new Set()
-    }
-  }
-
-  const saveInterestedRestaurants = (interestedSet, user = currentUser) => {
-    try {
-      localStorage.setItem(`interestedRestaurants_${user}`, JSON.stringify([...interestedSet]))
-    } catch (error) {
-      console.error('Error saving interested restaurants:', error)
-    }
-  }
-
-  const loadNotInterestedRestaurants = (user = currentUser) => {
-    try {
-      const notInterested = localStorage.getItem(`notInterestedRestaurants_${user}`)
-      return notInterested ? new Set(JSON.parse(notInterested)) : new Set()
-    } catch (error) {
-      console.error('Error loading not interested restaurants:', error)
-      return new Set()
-    }
-  }
-
-  const saveNotInterestedRestaurants = (notInterestedSet, user = currentUser) => {
-    try {
-      localStorage.setItem(`notInterestedRestaurants_${user}`, JSON.stringify([...notInterestedSet]))
-    } catch (error) {
-      console.error('Error saving not interested restaurants:', error)
-    }
-  }
-
-  // Social feed localStorage functions
-  const loadSocialFeed = () => {
-    try {
-      const feed = localStorage.getItem('socialFeed')
-      return feed ? JSON.parse(feed) : []
+      const feedData = await apiService.getSocialFeed(50)
+      if (feedData.success) {
+        setSocialFeed(feedData.data)
+      }
     } catch (error) {
       console.error('Error loading social feed:', error)
-      return []
+      setSocialFeed([])
     }
   }
 
-  const saveSocialFeed = (feedEntries) => {
+  const clearSocialFeed = async () => {
+    if (!confirm('Are you sure you want to clear all social feed entries? This cannot be undone.')) {
+      return
+    }
+
     try {
-      localStorage.setItem('socialFeed', JSON.stringify(feedEntries))
+      const result = await apiService.clearSocialFeed()
+      if (result.success) {
+        setSocialFeed([])
+        setError(null)
+      }
     } catch (error) {
-      console.error('Error saving social feed:', error)
+      console.error('Error clearing social feed:', error)
+      setError('Failed to clear social feed')
     }
   }
 
-  const addFeedEntry = (user, restaurantName, restaurantId, action = 'visited') => {
-    const newEntry = {
-      id: Date.now(),
-      user: user,
-      restaurantName: restaurantName,
-      restaurantId: restaurantId,
-      action: action,
-      timestamp: new Date().toISOString(),
-      date: new Date().toLocaleDateString()
-    }
-
-    const currentFeed = loadSocialFeed()
-    const updatedFeed = [newEntry, ...currentFeed].slice(0, 50) // Keep only last 50 entries
-    setSocialFeed(updatedFeed)
-    saveSocialFeed(updatedFeed)
-  }
-
-  const removeFeedEntry = (user, restaurantId) => {
-    const currentFeed = loadSocialFeed()
-    const updatedFeed = currentFeed.filter(entry =>
-      !(entry.user === user && entry.restaurantId === restaurantId && entry.action === 'visited')
-    )
-    setSocialFeed(updatedFeed)
-    saveSocialFeed(updatedFeed)
-  }
-
-  // Saved locations localStorage functions
-  const loadSavedLocations = () => {
+  const loadAvailableUsers = async () => {
     try {
-      const saved = localStorage.getItem('savedLocations')
-      return saved ? JSON.parse(saved) : []
+      const usersData = await apiService.getAllUsers()
+      if (usersData.success) {
+        // Combine default users with any additional users from database
+        const defaultUsers = ['Julien', 'Jimmy']
+        const dbUsers = usersData.data || []
+        const allUsers = [...new Set([...defaultUsers, ...dbUsers])] // Remove duplicates
+        setAvailableUsers(allUsers)
+
+        // Load visited restaurants for all users
+        await loadAllUsersVisitedRestaurants(allUsers)
+      }
     } catch (error) {
-      console.error('Error loading saved locations:', error)
-      return []
+      console.error('Error loading users:', error)
+      // Keep default users if API fails
+      setAvailableUsers(['Julien', 'Jimmy'])
+      await loadAllUsersVisitedRestaurants(['Julien', 'Jimmy'])
     }
   }
 
-  const saveSavedLocations = (locations) => {
+  const loadAllUsersVisitedRestaurants = async (users) => {
+    const allUsersData = {}
+
+    for (const username of users) {
+      try {
+        const userData = await apiService.getUser(username)
+        if (userData.success) {
+          allUsersData[username] = new Set(userData.data.visitedRestaurants)
+        } else {
+          allUsersData[username] = new Set()
+        }
+      } catch (error) {
+        console.error(`Error loading visited restaurants for ${username}:`, error)
+        allUsersData[username] = new Set()
+      }
+    }
+
+    setAllUsersVisitedRestaurants(allUsersData)
+  }
+
+  const toggleVisitedRestaurant = async (restaurantId) => {
+    const restaurant = allRestaurants.find(r => r.id === restaurantId)
+
     try {
-      localStorage.setItem('savedLocations', JSON.stringify(locations))
+      const result = await apiService.toggleVisitedRestaurant(currentUser, restaurantId, restaurant?.name, restaurant)
+
+      if (result.success) {
+        const newVisited = new Set(visitedRestaurants)
+        if (result.visited) {
+          newVisited.add(restaurantId)
+        } else {
+          newVisited.delete(restaurantId)
+        }
+        setVisitedRestaurants(newVisited)
+
+        // Update all users visited restaurants data
+        const newAllUsersData = { ...allUsersVisitedRestaurants }
+        if (!newAllUsersData[currentUser]) {
+          newAllUsersData[currentUser] = new Set()
+        }
+        if (result.visited) {
+          newAllUsersData[currentUser].add(restaurantId)
+        } else {
+          newAllUsersData[currentUser].delete(restaurantId)
+        }
+        setAllUsersVisitedRestaurants(newAllUsersData)
+
+        // Refresh social feed
+        loadSocialFeed()
+      }
     } catch (error) {
-      console.error('Error saving locations:', error)
+      console.error('Error toggling visited restaurant:', error)
+      setError('Failed to update visited status')
     }
   }
 
-  const saveCurrentLocation = () => {
-    const locationToSave = {
-      name: currentLocation.name,
-      coordinates: currentLocation.coordinates,
-      id: Date.now(),
-      savedAt: new Date().toLocaleDateString()
+  const toggleInterestedRestaurant = async (restaurantId) => {
+    const restaurant = allRestaurants.find(r => r.id === restaurantId)
+
+    try {
+      const result = await apiService.toggleInterestedRestaurant(currentUser, restaurantId, restaurant)
+
+      if (result.success) {
+        const newInterested = new Set(interestedRestaurants)
+        const newNotInterested = new Set(notInterestedRestaurants)
+
+        if (result.interested) {
+          newInterested.add(restaurantId)
+          newNotInterested.delete(restaurantId)
+        } else {
+          newInterested.delete(restaurantId)
+        }
+
+        setInterestedRestaurants(newInterested)
+        setNotInterestedRestaurants(newNotInterested)
+      }
+    } catch (error) {
+      console.error('Error toggling interested restaurant:', error)
+      setError('Failed to update interest status')
     }
-
-    const existingLocations = savedLocations.filter(loc =>
-      loc.name !== currentLocation.name
-    )
-
-    const updatedLocations = [locationToSave, ...existingLocations].slice(0, 10) // Keep max 10 saved locations
-    setSavedLocations(updatedLocations)
-    saveSavedLocations(updatedLocations)
   }
 
-  const removeSavedLocation = (locationId) => {
-    const updatedLocations = savedLocations.filter(loc => loc.id !== locationId)
-    setSavedLocations(updatedLocations)
-    saveSavedLocations(updatedLocations)
+  const toggleNotInterestedRestaurant = async (restaurantId) => {
+    const restaurant = allRestaurants.find(r => r.id === restaurantId)
+
+    try {
+      const result = await apiService.toggleNotInterestedRestaurant(currentUser, restaurantId, restaurant)
+
+      if (result.success) {
+        const newNotInterested = new Set(notInterestedRestaurants)
+        const newInterested = new Set(interestedRestaurants)
+
+        if (result.notInterested) {
+          newNotInterested.add(restaurantId)
+          newInterested.delete(restaurantId)
+        } else {
+          newNotInterested.delete(restaurantId)
+        }
+
+        setNotInterestedRestaurants(newNotInterested)
+        setInterestedRestaurants(newInterested)
+      }
+    } catch (error) {
+      console.error('Error toggling not interested restaurant:', error)
+      setError('Failed to update interest status')
+    }
+  }
+
+
+  const saveCurrentLocation = async () => {
+    try {
+      const result = await apiService.saveLocation(currentUser, currentLocation.name, currentLocation.coordinates)
+      if (result.success) {
+        setSavedLocations(result.savedLocations)
+      }
+    } catch (error) {
+      console.error('Error saving location:', error)
+      setError('Failed to save location')
+    }
+  }
+
+  const removeSavedLocation = async (locationId) => {
+    try {
+      const result = await apiService.removeSavedLocation(currentUser, locationId)
+      if (result.success) {
+        setSavedLocations(result.savedLocations)
+      }
+    } catch (error) {
+      console.error('Error removing saved location:', error)
+      setError('Failed to remove location')
+    }
   }
 
   const isLocationSaved = (locationName) => {
     return savedLocations.some(loc => loc.name === locationName)
   }
 
-  const toggleVisitedRestaurant = (restaurantId) => {
-    const restaurant = allRestaurants.find(r => r.id === restaurantId)
-    const newVisited = new Set(visitedRestaurants)
-
-    if (newVisited.has(restaurantId)) {
-      newVisited.delete(restaurantId)
-      // Remove from social feed when unchecked
-      removeFeedEntry(currentUser, restaurantId)
-    } else {
-      newVisited.add(restaurantId)
-      // Add to social feed
-      if (restaurant) {
-        addFeedEntry(currentUser, restaurant.name, restaurantId, 'visited')
-      }
-    }
-
-    setVisitedRestaurants(newVisited)
-    saveVisitedRestaurants(newVisited, currentUser)
-  }
-
-  const toggleInterestedRestaurant = (restaurantId) => {
-    const newInterested = new Set(interestedRestaurants)
-    const newNotInterested = new Set(notInterestedRestaurants)
-
-    if (newInterested.has(restaurantId)) {
-      newInterested.delete(restaurantId)
-    } else {
-      newInterested.add(restaurantId)
-      // Remove from not interested if it was there
-      newNotInterested.delete(restaurantId)
-      setNotInterestedRestaurants(newNotInterested)
-      saveNotInterestedRestaurants(newNotInterested, currentUser)
-    }
-
-    setInterestedRestaurants(newInterested)
-    saveInterestedRestaurants(newInterested, currentUser)
-  }
-
-  const toggleNotInterestedRestaurant = (restaurantId) => {
-    const newNotInterested = new Set(notInterestedRestaurants)
-    const newInterested = new Set(interestedRestaurants)
-
-    if (newNotInterested.has(restaurantId)) {
-      newNotInterested.delete(restaurantId)
-    } else {
-      newNotInterested.add(restaurantId)
-      // Remove from interested if it was there
-      newInterested.delete(restaurantId)
-      setInterestedRestaurants(newInterested)
-      saveInterestedRestaurants(newInterested, currentUser)
-    }
-
-    setNotInterestedRestaurants(newNotInterested)
-    saveNotInterestedRestaurants(newNotInterested, currentUser)
-  }
-
-
-  const isRestaurantVisited = (restaurantId) => {
-    return visitedRestaurants.has(restaurantId)
-  }
-
   // Determine which user visited a restaurant
   const getRestaurantVisitor = (restaurantId) => {
-    const julienVisited = loadVisitedRestaurants('Julien')
-    const jimmyVisited = loadVisitedRestaurants('Jimmy')
-
-    if (julienVisited.has(restaurantId)) {
-      return 'Julien'
-    } else if (jimmyVisited.has(restaurantId)) {
-      return 'Jimmy'
+    // Check all users to see who visited this restaurant
+    for (const [username, visitedSet] of Object.entries(allUsersVisitedRestaurants)) {
+      if (visitedSet && visitedSet.has && visitedSet.has(restaurantId)) {
+        return username
+      }
     }
-    return null // Not visited by anyone
+    return null
   }
 
   // Get appropriate icon based on interest level and visit status
   const getRestaurantIcon = (restaurantId) => {
-    // Priority 1: Current user's interest level (highest priority)
     if (interestedRestaurants.has(restaurantId)) {
       return greenIcon
     } else if (notInterestedRestaurants.has(restaurantId)) {
       return redIcon
     }
 
-    // Priority 2: Visited restaurants (orange for Julien, yellow for Jimmy)
     const visitor = getRestaurantVisitor(restaurantId)
     if (visitor === 'Julien') {
       return orangeIcon
@@ -408,7 +407,6 @@ const Restaurants = ({ loggedInUser }) => {
       return yellowIcon
     }
 
-    // Default: Grey for neutral/unvisited
     return greyIcon
   }
 
@@ -434,44 +432,30 @@ const Restaurants = ({ loggedInUser }) => {
     }
   }
 
-  // Reverse geocoding function to get address from coordinates
-  const reverseGeocode = async (lat, lon) => {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`
-      )
-      const data = await response.json()
-
-      if (data && data.display_name) {
-        // Extract meaningful address parts
-        const address = data.address || {}
-        const parts = []
-
-        if (address.house_number) parts.push(address.house_number)
-        if (address.road) parts.push(address.road)
-        if (address.suburb) parts.push(address.suburb)
-        if (address.city || address.town || address.village) {
-          parts.push(address.city || address.town || address.village)
-        }
-
-        return parts.length > 0 ? parts.join(', ') : data.display_name.split(',').slice(0, 2).join(',')
-      }
-      return null
-    } catch (error) {
-      console.error('Reverse geocoding failed:', error)
-      return null
-    }
-  }
-
   const fetchRestaurants = async (location = currentLocation, radius = searchRadius) => {
     setLoading(true)
     setError(null)
 
-    // Use the current location coordinates
     const lat = location.coordinates[0]
     const lon = location.coordinates[1]
 
-    const query = `[out:json][timeout:25];
+    try {
+      // First try to get restaurants from our API (cached data)
+      const apiResult = await apiService.searchRestaurants(lat, lon, radius, selectedCuisine)
+
+      if (apiResult.success && apiResult.data.length > 0) {
+        console.log('Found cached restaurants:', apiResult.data.length)
+        setAllRestaurants(apiResult.data)
+        setRestaurants(apiResult.data)
+        setLoading(false)
+        return
+      }
+
+      // If no cached data, fetch from external API
+      console.log('No cached data, fetching from Overpass API...')
+
+      // UPDATED QUERY - Added bars, pubs, and nightclubs
+      const query = `[out:json][timeout:25];
 (
   node[amenity=restaurant](around:${radius},${lat},${lon});
   way[amenity=restaurant](around:${radius},${lat},${lon});
@@ -489,11 +473,6 @@ const Restaurants = ({ loggedInUser }) => {
 );
 out center;`
 
-    console.log('Overpass API Query:', query)
-    console.log('Searching around coordinates:', lat, lon)
-    console.log('Radius:', radius, 'meters')
-
-    try {
       const response = await fetch('https://overpass-api.de/api/interpreter', {
         method: 'POST',
         body: query,
@@ -507,16 +486,13 @@ out center;`
       }
 
       const data = await response.json()
-      console.log('API Response:', data)
-      console.log('Number of elements found:', data.elements?.length || 0)
 
       if (!data.elements || data.elements.length === 0) {
-        console.log('No restaurants found in the response')
         setRestaurants([])
         return
       }
 
-      // Process the data to extract restaurant information
+      // Process the data
       const processedRestaurants = data.elements.map((element, index) => {
         const lat = element.lat || (element.center && element.center.lat)
         const lon = element.lon || (element.center && element.center.lon)
@@ -526,32 +502,26 @@ out center;`
                     element.tags?.brand ||
                     `${amenityType.charAt(0).toUpperCase() + amenityType.slice(1)} (Unnamed)`
 
-        // Capitalize first letter of words
         const capitalizeWords = (str) => {
           return str.split(' ').map(word =>
             word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
           ).join(' ')
         }
 
-        // Format cuisine: replace semicolons with commas and underscores with spaces, then capitalize
         const rawCuisine = element.tags?.cuisine || 'Not specified'
         const formattedCuisine = rawCuisine === 'Not specified'
           ? 'Not specified'
           : rawCuisine.split(';').map(c => capitalizeWords(c.trim().replace(/_/g, ' '))).join(', ')
 
-        // Format restaurant type with proper capitalization
         const formattedType = capitalizeWords(amenityType.replace(/_/g, ' '))
 
-        // Improved address extraction with multiple fallback options
         const getAddress = () => {
           const tags = element.tags || {}
 
-          // Try full address first
           if (tags['addr:full']) {
             return tags['addr:full']
           }
 
-          // Build address from components
           const components = []
           if (tags['addr:housenumber']) components.push(tags['addr:housenumber'])
           if (tags['addr:street']) components.push(tags['addr:street'])
@@ -559,16 +529,10 @@ out center;`
             return components.join(' ')
           }
 
-          // Try alternative address fields
           if (tags['addr:place']) return tags['addr:place']
           if (tags['addr:suburb']) return tags['addr:suburb']
           if (tags['addr:city']) return tags['addr:city']
 
-          // Try location-related tags
-          if (tags.location) return tags.location
-          if (tags.address) return tags.address
-
-          // Use coordinates as last resort
           if (lat && lon) {
             return `${lat.toFixed(4)}, ${lon.toFixed(4)}`
           }
@@ -590,53 +554,16 @@ out center;`
           takeaway: element.tags?.takeaway || 'N/A',
           delivery: element.tags?.delivery || 'N/A'
         }
-      }).filter(restaurant => restaurant.lat && restaurant.lng) // Only include restaurants with valid coordinates
+      }).filter(restaurant => restaurant.lat && restaurant.lng)
 
-      console.log('Processed restaurants:', processedRestaurants)
+      setAllRestaurants(processedRestaurants)
+      setRestaurants(processedRestaurants)
 
-      // Enhance addresses for restaurants that only have coordinates
-      const enhancedRestaurants = await enhanceAddresses(processedRestaurants)
+      // Restaurants will be saved to database only when users interact with them
 
-      setAllRestaurants(enhancedRestaurants)
-      setRestaurants(enhancedRestaurants)
     } catch (err) {
       console.error('Error fetching restaurants:', err)
-
-      // Fallback to sample restaurants if API fails
-      const fallbackRestaurants = [
-        {
-          id: 'f1',
-          name: 'Manly Beach Cafe',
-          type: 'cafe',
-          cuisine: 'Australian',
-          address: 'The Corso, Manly Beach',
-          lat: -33.7975,
-          lng: 151.2878,
-          phone: 'N/A',
-          website: null,
-          opening_hours: '7:00-17:00',
-          takeaway: 'yes',
-          delivery: 'no'
-        },
-        {
-          id: 'f2',
-          name: 'Seaside Restaurant',
-          type: 'restaurant',
-          cuisine: 'Seafood',
-          address: 'Marine Parade, Manly',
-          lat: -33.7980,
-          lng: 151.2875,
-          phone: 'N/A',
-          website: null,
-          opening_hours: '12:00-22:00',
-          takeaway: 'yes',
-          delivery: 'yes'
-        }
-      ]
-
-      setAllRestaurants(fallbackRestaurants)
-      setRestaurants(fallbackRestaurants)
-      setError('Using sample data. API connection issue: ' + err.message)
+      setError('Failed to fetch restaurants: ' + err.message)
     } finally {
       setLoading(false)
     }
@@ -648,7 +575,6 @@ out center;`
 
     allRestaurants.forEach(restaurant => {
       if (restaurant.cuisine && restaurant.cuisine !== 'Not specified') {
-        // Split cuisine by comma and add each individual cuisine
         restaurant.cuisine.split(',').forEach(cuisine => {
           const trimmedCuisine = cuisine.trim()
           cuisineCount.set(trimmedCuisine, (cuisineCount.get(trimmedCuisine) || 0) + 1)
@@ -656,7 +582,6 @@ out center;`
       }
     })
 
-    // Convert to array of objects with cuisine and count, then sort
     return Array.from(cuisineCount.entries())
       .map(([cuisine, count]) => ({ cuisine, count }))
       .sort((a, b) => a.cuisine.localeCompare(b.cuisine))
@@ -671,7 +596,7 @@ out center;`
         const normalizedType = restaurant.type.toLowerCase()
         let displayType = restaurant.type
 
-        // Normalize common variations
+        // UPDATED - Added bar, pub, nightclub normalization
         if (normalizedType.includes('restaurant')) {
           displayType = 'Restaurant'
         } else if (normalizedType.includes('fast') || normalizedType.includes('fast_food')) {
@@ -690,7 +615,6 @@ out center;`
       }
     })
 
-    // Convert to array of objects with type and count, then sort
     return Array.from(typeCount.entries())
       .map(([type, count]) => ({ type, count }))
       .sort((a, b) => a.type.localeCompare(b.type))
@@ -713,6 +637,7 @@ out center;`
         const normalizedType = restaurant.type.toLowerCase()
         const filterType = type.toLowerCase()
 
+        // UPDATED - Added bar, pub, nightclub filtering
         if (filterType === 'restaurant') {
           return normalizedType.includes('restaurant')
         } else if (filterType === 'fast food') {
@@ -732,27 +657,24 @@ out center;`
 
     // Filter by visit status
     if (visitStatus === 'visited') {
-      filtered = filtered.filter(restaurant => isRestaurantVisited(restaurant.id))
+      filtered = filtered.filter(restaurant => visitedRestaurants.has(restaurant.id))
     } else if (visitStatus === 'unvisited') {
-      filtered = filtered.filter(restaurant => !isRestaurantVisited(restaurant.id))
+      filtered = filtered.filter(restaurant => !visitedRestaurants.has(restaurant.id))
     }
 
     setRestaurants(filtered)
   }
 
-  // Handle cuisine filter change
   const handleCuisineChange = (cuisine) => {
     setSelectedCuisine(cuisine)
     filterRestaurants(cuisine, selectedType, visitFilter)
   }
 
-  // Handle type filter change
   const handleTypeChange = (type) => {
     setSelectedType(type)
     filterRestaurants(selectedCuisine, type, visitFilter)
   }
 
-  // Handle visit filter change
   const handleVisitFilterChange = (visitStatus) => {
     setVisitFilter(visitStatus)
     filterRestaurants(selectedCuisine, selectedType, visitStatus)
@@ -780,7 +702,6 @@ out center;`
     return `Found ${count} ${pluralType}`
   }
 
-  // Handle location search
   const handleLocationSearch = async () => {
     if (!searchLocation.trim()) {
       setError('Please enter a location')
@@ -806,17 +727,14 @@ out center;`
     }
   }
 
-  // Handle radius change
   const handleRadiusChange = (newRadius) => {
     setSearchRadius(newRadius)
   }
 
-  // Apply new radius to current search
   const applyRadiusChange = async () => {
     await fetchRestaurants(currentLocation, searchRadius)
   }
 
-  // Combined preset locations (only saved locations, no defaults)
   const presetLocations = savedLocations.map(loc => ({
     ...loc,
     isDefault: false
@@ -828,8 +746,7 @@ out center;`
     await fetchRestaurants(location, searchRadius)
   }
 
-  // Enhance addresses for restaurants with missing address data
-  // Get emoji for restaurant based on cuisine or type
+  // UPDATED - Enhanced emoji mapping with bars and nightclubs
   const getRestaurantEmoji = (cuisine, type) => {
     // Cuisine-based emojis (prioritized)
     const cuisineEmojis = {
@@ -974,62 +891,27 @@ out center;`
     return '🍽️'
   }
 
-  const enhanceAddresses = async (restaurants) => {
-    const enhanced = [...restaurants]
-    let enhanceCount = 0
-    const maxEnhancements = 10 // Limit to avoid too many API calls
-
-    for (let i = 0; i < enhanced.length && enhanceCount < maxEnhancements; i++) {
-      const restaurant = enhanced[i]
-
-      // Check if address needs enhancement (only coordinates or "Address not available")
-      if (restaurant.address === 'Address not available' ||
-          (restaurant.address && restaurant.address.includes(',') && restaurant.address.split(',').length === 2 &&
-           restaurant.address.match(/^-?\d+\.\d+, -?\d+\.\d+$/))) {
-
-        try {
-          const enhancedAddress = await reverseGeocode(restaurant.lat, restaurant.lng)
-          if (enhancedAddress) {
-            enhanced[i] = { ...restaurant, address: enhancedAddress }
-            enhanceCount++
-            console.log(`Enhanced address for ${restaurant.name}: ${enhancedAddress}`)
-
-            // Add small delay to avoid overwhelming the API
-            await new Promise(resolve => setTimeout(resolve, 100))
-          }
-        } catch (error) {
-          console.error(`Failed to enhance address for ${restaurant.name}:`, error)
-        }
+  useEffect(() => {
+    const initializeApp = async () => {
+      await loadAvailableUsers()
+      if (currentUser) {
+        await loadUserData(currentUser)
       }
+      await loadSocialFeed()
+      await fetchRestaurants()
     }
 
-    console.log(`Enhanced addresses for ${enhanceCount} restaurants`)
-    return enhanced
-  }
-
-  useEffect(() => {
-    // Load visited restaurants from localStorage for current user
-    setVisitedRestaurants(loadVisitedRestaurants(currentUser))
-    // Load interested restaurants from localStorage for current user
-    setInterestedRestaurants(loadInterestedRestaurants(currentUser))
-    // Load not interested restaurants from localStorage for current user
-    setNotInterestedRestaurants(loadNotInterestedRestaurants(currentUser))
-    // Load social feed
-    setSocialFeed(loadSocialFeed())
-    // Load saved locations
-    setSavedLocations(loadSavedLocations())
-    fetchRestaurants()
+    initializeApp()
   }, [])
 
   // Update user data when logged-in user changes
   useEffect(() => {
-    setVisitedRestaurants(loadVisitedRestaurants(currentUser))
-    setInterestedRestaurants(loadInterestedRestaurants(currentUser))
-    setNotInterestedRestaurants(loadNotInterestedRestaurants(currentUser))
+    if (currentUser) {
+      loadUserData(currentUser)
+    }
   }, [currentUser])
 
   useEffect(() => {
-    // Update filtered restaurants when allRestaurants or visitedRestaurants changes
     filterRestaurants(selectedCuisine, selectedType, visitFilter)
   }, [allRestaurants, selectedCuisine, selectedType, visitFilter, visitedRestaurants])
 
@@ -1039,7 +921,7 @@ out center;`
       <div className="restaurants-container">
         <div className="login-required">
           <h1>Login Required</h1>
-          <p>Please log in to access the restaurants map and features.</p>
+          <p>Please log in to access the establishments map and features.</p>
         </div>
       </div>
     )
@@ -1049,7 +931,7 @@ out center;`
     return (
       <div className="restaurants-container">
         <div className="loading-container">
-          <h1>Loading Restaurants...</h1>
+          <h1>Loading Establishments...</h1>
           <div className="loading-spinner">🍽️</div>
         </div>
       </div>
@@ -1060,9 +942,9 @@ out center;`
     return (
       <div className="restaurants-container">
         <div className="error-container">
-          <h1>Restaurants</h1>
+          <h1>Establishments</h1>
           <p className="error-message">{error}</p>
-          <button onClick={fetchRestaurants} className="retry-button">
+          <button onClick={() => fetchRestaurants()} className="retry-button">
             Try Again
           </button>
         </div>
@@ -1095,15 +977,24 @@ out center;`
         {/* Social Feed */}
         {showFeed && (
           <div className="social-feed">
-            <h3>Recent Restaurant Visits</h3>
+            <div className="social-feed-header">
+              <h3>Recent Activity</h3>
+              {socialFeed.length > 0 && (
+                <button onClick={clearSocialFeed} className="clear-feed-btn">
+                  Clear Feed
+                </button>
+              )}
+            </div>
             {socialFeed.length === 0 ? (
-              <p className="no-feed">No recent visits. Start exploring restaurants!</p>
+              <p className="no-feed">No recent activity. Start exploring establishments!</p>
             ) : (
               <div className="feed-entries">
                 {socialFeed.slice(0, 10).map(entry => (
                   <div key={entry.id} className="feed-entry">
                     <span className="feed-user">{entry.user}</span>
-                    <span className="feed-action">has visited</span>
+                    <span className="feed-action">
+                      {entry.action === 'commented' ? 'commented on' : 'has visited'}
+                    </span>
                     <span className="feed-restaurant">{entry.restaurantName}</span>
                     <span className="feed-date">on {entry.date}</span>
                   </div>
@@ -1182,25 +1073,23 @@ out center;`
               <div className="preset-label">Quick locations:</div>
               <div className="preset-buttons">
                 {presetLocations.map((location) => (
-                  <div key={location.name} className="preset-button-container">
+                  <div key={location._id} className="preset-button-container">
                     <button
                       onClick={() => selectPresetLocation(location)}
                       className={`preset-button ${currentLocation.name === location.name ? 'active' : ''}`}
                     >
                       {location.name.split(',')[0]} ⭐
                     </button>
-                    {!location.isDefault && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          removeSavedLocation(location.id)
-                        }}
-                        className="remove-location-button"
-                        title="Remove saved location"
-                      >
-                        ×
-                      </button>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        removeSavedLocation(location._id)
+                      }}
+                      className="remove-location-button"
+                      title="Remove saved location"
+                    >
+                      ×
+                    </button>
                   </div>
                 ))}
               </div>
@@ -1258,7 +1147,7 @@ out center;`
               onChange={(e) => handleVisitFilterChange(e.target.value)}
               className="visit-filter"
             >
-              <option value="all">All Restaurants</option>
+              <option value="all">All Establishments</option>
               <option value="visited">Visited ({[...visitedRestaurants].filter(id => allRestaurants.some(r => r.id === id)).length})</option>
               <option value="unvisited">Not Visited</option>
             </select>
@@ -1283,7 +1172,7 @@ out center;`
           <Popup>
             <div className="reference-popup">
               <h3>📍 {currentLocation.name}</h3>
-              <p>Reference point for restaurant search</p>
+              <p>Reference point for establishment search</p>
               <p>Radius: {searchRadius/1000}km</p>
             </div>
           </Popup>
@@ -1302,7 +1191,7 @@ out center;`
                   <h3>
                     {restaurant.name} {getRestaurantEmoji(restaurant.cuisine.toLowerCase(), restaurant.type.toLowerCase())}
                   </h3>
-                  {isRestaurantVisited(restaurant.id) && (
+                  {visitedRestaurants.has(restaurant.id) && (
                     <span className="visited-badge">✅ Visited</span>
                   )}
                 </div>
@@ -1327,7 +1216,7 @@ out center;`
                 <div className="restaurant-controls-grid">
                   <button
                     onClick={() => toggleVisitedRestaurant(restaurant.id)}
-                    className={`control-button visited-button ${isRestaurantVisited(restaurant.id) ? 'active' : ''} ${currentUser.toLowerCase()}-profile`}
+                    className={`control-button visited-button ${visitedRestaurants.has(restaurant.id) ? 'active' : ''} ${currentUser.toLowerCase()}-profile`}
                   >
                     Visited
                   </button>
@@ -1344,6 +1233,12 @@ out center;`
                     Not Interested
                   </button>
                 </div>
+                <RestaurantComments
+                  restaurantId={restaurant.id}
+                  currentUser={currentUser}
+                  restaurantName={restaurant.name}
+                  onSocialFeedUpdate={loadSocialFeed}
+                />
               </div>
             </Popup>
           </Marker>
@@ -1351,12 +1246,12 @@ out center;`
       </MapContainer>
 
       <div className="restaurant-list">
-        <h2>Restaurant Directory</h2>
+        <h2>Establishment Directory</h2>
         <div className="restaurant-grid">
           {restaurants.slice(0, 12).map((restaurant, index) => (
             <div
               key={restaurant.id}
-              className={`restaurant-card ${isRestaurantVisited(restaurant.id) ? 'visited-card' : ''} ${index % 2 === 1 ? 'alternate' : ''}`}
+              className={`restaurant-card ${visitedRestaurants.has(restaurant.id) ? 'visited-card' : ''} ${index % 2 === 1 ? 'alternate' : ''}`}
             >
               <div className="card-header">
                 <div className="card-title">
@@ -1376,7 +1271,7 @@ out center;`
                       {restaurant.name} {getRestaurantEmoji(restaurant.cuisine.toLowerCase(), restaurant.type.toLowerCase())}
                     </h3>
                   )}
-                  {isRestaurantVisited(restaurant.id) && (
+                  {visitedRestaurants.has(restaurant.id) && (
                     <span className="visited-badge">✅ Visited</span>
                   )}
                 </div>
@@ -1401,7 +1296,7 @@ out center;`
               <div className="restaurant-controls-grid">
                 <button
                   onClick={() => toggleVisitedRestaurant(restaurant.id)}
-                  className={`control-button visited-button ${isRestaurantVisited(restaurant.id) ? 'active' : ''} ${currentUser.toLowerCase()}-profile`}
+                  className={`control-button visited-button ${visitedRestaurants.has(restaurant.id) ? 'active' : ''} ${currentUser.toLowerCase()}-profile`}
                 >
                   Visited
                 </button>
@@ -1424,10 +1319,9 @@ out center;`
 
         {restaurants.length > 12 && (
           <div className="show-more">
-            <p>Showing first 12 of {restaurants.length} restaurants</p>
+            <p>Showing first 12 of {restaurants.length} establishments</p>
             <button onClick={() => {
-              // Could implement pagination or show all functionality
-              alert('All restaurants are shown on the map above!')
+              alert('All establishments are shown on the map above!')
             }}>
               View All on Map
             </button>
@@ -1438,4 +1332,4 @@ out center;`
   )
 }
 
-export default Restaurants
+export default Establishments

@@ -2,14 +2,12 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import SydneyMap from './components/SydneyMap'
 import './components/SydneyMap.css'
-import Restaurants from './components/Restaurants'
-import RestaurantsWithAPI from './components/RestaurantsWithAPI'
+import Establishments from './components/Establishments'
 import './components/Restaurants.css'
 import LoginModal from './components/LoginModal'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
-  const [useAPI, setUseAPI] = useState(true) // Toggle between localStorage and MongoDB
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [loggedInUser, setLoggedInUser] = useState(null)
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -72,8 +70,8 @@ function App() {
     switch (currentPage) {
       case 'map':
         return <SydneyMap loggedInUser={loggedInUser} />
-      case 'restaurants':
-        return useAPI ? <RestaurantsWithAPI loggedInUser={loggedInUser} /> : <Restaurants loggedInUser={loggedInUser} />
+      case 'establishments':
+        return <Establishments loggedInUser={loggedInUser} />
       default:
         return <HomePage />
     }
@@ -149,7 +147,7 @@ function App() {
             <a href="#features" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); }}>Features</a>
             <a href="#map" onClick={(e) => { e.preventDefault(); setCurrentPage('map'); }}>Map</a>
             {loggedInUser && (
-              <a href="#restaurants" onClick={(e) => { e.preventDefault(); setCurrentPage('restaurants'); }}>Restaurants</a>
+              <a href="#establishments" onClick={(e) => { e.preventDefault(); setCurrentPage('establishments'); }}>Establishments</a>
             )}
             <a href="#about" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); }}>About</a>
             <a href="#contact" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); }}>Contact</a>
@@ -184,20 +182,6 @@ function App() {
                 Login
               </button>
             )}
-            <button
-              onClick={() => setUseAPI(!useAPI)}
-              style={{
-                background: useAPI ? '#4CAF50' : '#ff9800',
-                color: 'white',
-                border: 'none',
-                padding: '8px 12px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
-            >
-              {useAPI ? 'MongoDB' : 'LocalStorage'}
-            </button>
             <button
               onClick={toggleDarkMode}
               style={{
