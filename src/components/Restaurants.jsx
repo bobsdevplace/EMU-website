@@ -72,7 +72,7 @@ const Restaurants = ({ loggedInUser }) => {
 
   // Location and search state
   const [searchLocation, setSearchLocation] = useState('Manly Beach, Australia')
-  const [searchRadius, setSearchRadius] = useState(5000) // in meters
+  const [searchRadius, setSearchRadius] = useState(1000) // in meters
   const [currentLocation, setCurrentLocation] = useState({
     name: 'Manly Beach, Australia',
     coordinates: [-33.797286, 151.287778]
@@ -1246,7 +1246,7 @@ out center;`
 
       <MapContainer
         center={currentLocation.coordinates}
-        zoom={12}
+        zoom={15}
         key={`${currentLocation.coordinates[0]}-${currentLocation.coordinates[1]}`}
         style={{ height: '600px', width: '100%' }}
         className="restaurant-map"
